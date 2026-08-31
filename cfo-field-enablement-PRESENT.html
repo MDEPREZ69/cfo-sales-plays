@@ -251,90 +251,132 @@ select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-r
 </div>
 
 <!-- ══ SLIDE 06 — CORTEX AI ARCHITECTURE ══ -->
-<div class="slide" id="slide-6">
-  <div class="slide-bg bg-white"></div>
-  <div class="slide-content" style="padding:1rem 2rem;">
-    <h2 style="font-size:1.6rem;color:var(--text-dark);margin:0 0 0.7rem;font-weight:900;line-height:1.1;">Snowflake Cortex AI Architecture</h2>
+<div class="slide dark-slide" id="slide-6">
+  <div class="slide-bg" style="background:linear-gradient(150deg,#042130 0%,#0a3248 50%,#0d3a52 100%);"></div>
+  <div class="slide-content" style="padding:0.8rem 1.6rem;">
+    <!-- Title row -->
+    <div style="display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.55rem;">
+      <div>
+        <h2 style="font-size:1.35rem;color:#fff;margin:0;font-weight:900;line-height:1.15;">Snowflake AI Data Cloud</h2>
+        <h2 style="font-size:1.15rem;color:var(--sf-star);margin:0;font-weight:700;line-height:1.2;">The Agentic Foundation</h2>
+      </div>
+      <p style="font-size:0.62rem;color:rgba(255,255,255,0.45);max-width:220px;margin:0;">Governed agentic AI for finance teams, grounded in your financial data.</p>
+    </div>
 
-    <!-- GOVERNANCE FRAME -->
-    <div style="position:relative;border:2px solid var(--sf-blue);border-radius:16px;padding:0.7rem 0.9rem 0.65rem;margin-bottom:0.6rem;">
-      <!-- Governance header bar -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:0.6rem;margin:-1.4rem auto 0.55rem;width:fit-content;background:#fff;padding:0 0.8rem;">
-        <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.15em;color:var(--text-dark);">GOVERNANCE</span>
-        <span style="color:#ccc;">|</span>
-        <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.15em;color:var(--text-dark);">POLICY CONTROL</span>
-        <span style="color:#ccc;">|</span>
-        <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.15em;color:var(--text-dark);">AUDIT &amp; LINEAGE</span>
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:1.5px solid var(--sf-blue);border-radius:5px;margin-left:0.3rem;">
-          <span style="font-size:0.55rem;color:var(--sf-blue);">&#128274;</span>
-        </span>
+    <!-- GET WORK DONE bar -->
+    <div style="background:linear-gradient(90deg,var(--sf-star),var(--sf-blue));border-radius:8px;padding:0.35rem 0.7rem;margin-bottom:0.5rem;">
+      <div style="text-align:center;font-size:0.55rem;font-weight:800;color:#fff;letter-spacing:0.15em;margin-bottom:0.25rem;">GET WORK DONE</div>
+      <div style="display:flex;justify-content:center;gap:1.2rem;">
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Ideation</span>
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Dashboards</span>
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Measure</span>
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Forecast</span>
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Share &amp; Collaborate</span>
+        <span style="font-size:0.58rem;color:#fff;font-weight:600;">Optimize</span>
+      </div>
+    </div>
+
+    <!-- MAIN 3-COLUMN LAYOUT: Context | Architecture | Outcomes -->
+    <div style="display:grid;grid-template-columns:170px 1fr 185px;gap:0.5rem;margin-bottom:0.45rem;">
+
+      <!-- LEFT: BRING YOUR CONTEXT -->
+      <div style="border:1.5px solid rgba(113,211,220,0.4);border-radius:10px;padding:0.5rem 0.55rem;">
+        <div style="font-size:0.52rem;font-weight:800;letter-spacing:0.12em;color:var(--sf-star);margin-bottom:0.4rem;text-align:center;">BRING YOUR CONTEXT</div>
+        <div style="display:flex;flex-direction:column;gap:0.3rem;">
+          <div style="display:flex;align-items:center;gap:0.35rem;"><span style="font-size:0.7rem;">&#128202;</span><span style="font-size:0.58rem;color:rgba(255,255,255,0.85);font-weight:600;">Report</span></div>
+          <div style="display:flex;align-items:center;gap:0.35rem;"><span style="font-size:0.7rem;">&#128194;</span><span style="font-size:0.58rem;color:rgba(255,255,255,0.85);font-weight:600;">ERP &amp; GL data</span></div>
+          <div style="display:flex;align-items:center;gap:0.35rem;"><span style="font-size:0.7rem;">&#127970;</span><span style="font-size:0.58rem;color:rgba(255,255,255,0.85);font-weight:600;">Company data</span></div>
+          <div style="display:flex;align-items:center;gap:0.35rem;"><span style="font-size:0.7rem;">&#128200;</span><span style="font-size:0.58rem;color:rgba(255,255,255,0.85);font-weight:600;">Planning tools</span></div>
+          <div style="display:flex;align-items:center;gap:0.35rem;"><span style="font-size:0.7rem;">&#128268;</span><span style="font-size:0.58rem;color:rgba(255,255,255,0.85);font-weight:600;">Apps &amp; MCP</span></div>
+        </div>
       </div>
 
-      <!-- APPS LAYER -->
-      <div style="background:var(--sf-blue);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.45rem;display:flex;align-items:center;gap:0.5rem;">
-        <span style="font-size:0.72rem;font-weight:800;color:#fff;min-width:52px;">APPS</span>
-        <div style="flex:1;display:flex;gap:0.4rem;">
-          <div style="flex:1;background:#fff;border-radius:8px;padding:0.4rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">Snowflake CoWork</span>
+      <!-- CENTER: CORTEX AI ARCHITECTURE (matching the official diagram) -->
+      <div style="position:relative;border:2px solid var(--sf-blue);border-radius:12px;padding:0.5rem 0.55rem 0.4rem;">
+        <!-- Governance header on border -->
+        <div style="position:absolute;top:-0.55rem;left:50%;transform:translateX(-50%);background:#0a3248;padding:0 0.5rem;display:flex;align-items:center;gap:0.4rem;white-space:nowrap;">
+          <span style="font-size:0.42rem;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.7);">GOVERNANCE</span>
+          <span style="color:rgba(255,255,255,0.25);font-size:0.4rem;">|</span>
+          <span style="font-size:0.42rem;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.7);">POLICY CONTROL</span>
+          <span style="color:rgba(255,255,255,0.25);font-size:0.4rem;">|</span>
+          <span style="font-size:0.42rem;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.7);">AUDIT &amp; LINEAGE</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border:1px solid var(--sf-blue);border-radius:3px;">
+            <span style="font-size:0.4rem;color:var(--sf-blue);">&#128274;</span>
+          </span>
+        </div>
+
+        <!-- APPS row -->
+        <div style="background:var(--sf-blue);border-radius:8px;padding:0.32rem 0.5rem;margin-bottom:0.3rem;display:flex;align-items:center;gap:0.4rem;">
+          <span style="font-size:0.58rem;font-weight:800;color:#fff;min-width:38px;">APPS</span>
+          <div style="flex:1;display:flex;gap:0.3rem;">
+            <div style="flex:1;background:#fff;border-radius:6px;padding:0.28rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">CoWork</span></div>
+            <div style="flex:1;background:#fff;border-radius:6px;padding:0.28rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">CoCo</span></div>
+            <div style="flex:1;background:#fff;border-radius:6px;padding:0.28rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">SnowPlan</span></div>
           </div>
-          <div style="flex:1;background:#fff;border-radius:8px;padding:0.4rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">Snowflake CoCo</span>
+        </div>
+
+        <!-- APIS row -->
+        <div style="background:rgba(227,244,252,0.15);border-radius:8px;padding:0.32rem 0.5rem;margin-bottom:0.3rem;display:flex;align-items:center;gap:0.4rem;">
+          <span style="font-size:0.58rem;font-weight:800;color:rgba(255,255,255,0.85);min-width:38px;">APIS</span>
+          <div style="flex:1;display:flex;gap:0.3rem;">
+            <div style="flex:1;background:#fff;border-radius:6px;padding:0.28rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">Cortex Agents</span></div>
+            <div style="flex:1;background:#fff;border-radius:6px;padding:0.28rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">Cortex AI Functions</span></div>
           </div>
-          <div style="flex:1;background:#fff;border-radius:8px;padding:0.4rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">SnowPlan</span>
+        </div>
+
+        <!-- CONTEXT row -->
+        <div style="background:var(--sf-mid);border-radius:8px;padding:0.32rem 0.5rem;display:flex;align-items:flex-start;gap:0.4rem;">
+          <span style="font-size:0.58rem;font-weight:800;color:#fff;min-width:38px;padding-top:0.18rem;">CONTEXT</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:0.22rem;">
+            <div style="background:#fff;border-radius:6px;padding:0.25rem 0.3rem;text-align:center;"><span style="font-size:0.54rem;font-weight:700;color:var(--text-dark);">Cortex Sense Runtime</span></div>
+            <div style="display:flex;gap:0.25rem;">
+              <div style="flex:1;background:#fff;border-radius:6px;padding:0.22rem 0.2rem;text-align:center;"><span style="font-size:0.48rem;font-weight:700;color:var(--text-dark);">MCP &amp; Connectors</span></div>
+              <div style="flex:1;background:#fff;border-radius:6px;padding:0.22rem 0.2rem;text-align:center;"><span style="font-size:0.48rem;font-weight:700;color:var(--text-dark);">Semantic Views</span></div>
+              <div style="flex:1;background:#fff;border-radius:6px;padding:0.22rem 0.2rem;text-align:center;"><span style="font-size:0.48rem;font-weight:700;color:var(--text-dark);">Business Logic</span></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- APIS LAYER -->
-      <div style="background:#E3F4FC;border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.45rem;display:flex;align-items:center;gap:0.5rem;">
-        <span style="font-size:0.72rem;font-weight:800;color:var(--text-dark);min-width:52px;">APIS</span>
-        <div style="flex:1;display:flex;gap:0.4rem;">
-          <div style="flex:1;background:#fff;border-radius:8px;padding:0.4rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">Cortex Agents</span>
-          </div>
-          <div style="flex:1;background:#fff;border-radius:8px;padding:0.4rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">Cortex AI Functions</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CONTEXT LAYER -->
-      <div style="background:var(--sf-mid);border-radius:10px;padding:0.5rem 0.7rem;display:flex;align-items:flex-start;gap:0.5rem;">
-        <span style="font-size:0.72rem;font-weight:800;color:#fff;min-width:52px;padding-top:0.25rem;">CONTEXT</span>
-        <div style="flex:1;display:flex;flex-direction:column;gap:0.35rem;">
-          <div style="background:#fff;border-radius:8px;padding:0.38rem 0.5rem;text-align:center;">
-            <span style="font-size:0.68rem;font-weight:700;color:var(--text-dark);">Cortex Sense Runtime</span>
-          </div>
-          <div style="display:flex;gap:0.4rem;">
-            <div style="flex:1;background:#fff;border-radius:8px;padding:0.38rem 0.5rem;text-align:center;">
-              <span style="font-size:0.65rem;font-weight:700;color:var(--text-dark);">MCP &amp; Connectors</span>
-            </div>
-            <div style="flex:1;background:#fff;border-radius:8px;padding:0.38rem 0.5rem;text-align:center;">
-              <span style="font-size:0.65rem;font-weight:700;color:var(--text-dark);">Semantic Views</span>
-            </div>
-            <div style="flex:1;background:#fff;border-radius:8px;padding:0.38rem 0.5rem;text-align:center;">
-              <span style="font-size:0.65rem;font-weight:700;color:var(--text-dark);">Business Logic</span>
-            </div>
-          </div>
+      <!-- RIGHT: DELIVER OUTCOMES -->
+      <div style="border:1.5px solid rgba(113,211,220,0.4);border-radius:10px;padding:0.5rem 0.55rem;">
+        <div style="font-size:0.52rem;font-weight:800;letter-spacing:0.12em;color:var(--sf-star);margin-bottom:0.35rem;text-align:center;">DELIVER OUTCOMES</div>
+        <div style="display:flex;flex-direction:column;gap:0.22rem;">
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">Variance analysis &amp; close cycle</span></div>
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">Daily continuous forecasting</span></div>
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">T&amp;E spend intelligence</span></div>
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">Board pack &amp; earnings narrative</span></div>
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">Scenario modelling &amp; FP&amp;A</span></div>
+          <div style="background:rgba(113,211,220,0.12);border-radius:6px;padding:0.25rem 0.4rem;text-align:center;"><span style="font-size:0.5rem;color:#fff;font-weight:600;">SOX &amp; regulatory compliance</span></div>
         </div>
       </div>
     </div>
 
-    <!-- LLM PROVIDER LOGOS -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:1.4rem;flex-wrap:wrap;">
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);letter-spacing:0.02em;">OpenAI</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);letter-spacing:0.06em;font-variant:small-caps;">ANTHROPIC</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);">Gemini</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);">Meta</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);">Grok</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);">Mistral AI</span>
-      <span style="font-size:0.7rem;font-weight:700;color:var(--text-dark);">DeepSeek</span>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="16" style="display:inline-block;vertical-align:middle;opacity:0.7;">
+    <!-- FLOW ARROWS between columns (overlaid) -->
+    <div style="display:grid;grid-template-columns:170px 1fr 185px;gap:0.5rem;margin-top:-3.8rem;margin-bottom:3.2rem;pointer-events:none;">
+      <div style="display:flex;align-items:center;justify-content:flex-end;padding-right:0.1rem;"><span style="font-size:1.2rem;color:var(--sf-blue);opacity:0.7;">&#10145;</span></div>
+      <div></div>
+      <div style="display:flex;align-items:center;justify-content:flex-start;padding-left:0.1rem;"><span style="font-size:1.2rem;color:var(--sf-blue);opacity:0.7;">&#10145;</span></div>
+    </div>
+
+    <!-- CHOOSE YOUR MODELS -->
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.6rem;">
+      <div style="text-align:center;font-size:0.48rem;font-weight:800;letter-spacing:0.15em;color:rgba(255,255,255,0.5);margin-bottom:0.2rem;">CHOOSE YOUR MODELS</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.06em;">ANTHROPIC</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">Gemini</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">Hugging Face</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">Mistral AI</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">Meta</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">OpenAI</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">Grok</span>
+        <span style="font-size:0.58rem;font-weight:700;color:rgba(255,255,255,0.7);">DeepSeek</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="12" style="display:inline-block;vertical-align:middle;filter:brightness(0) invert(1);opacity:0.6;">
+      </div>
     </div>
   </div>
   <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24"></div>
-  <div class="slide-number">06 / 19</div>
+  <div class="slide-number" style="color:rgba(255,255,255,0.4);">06 / 19</div>
 </div>
 
 <!-- ══ SLIDE 07 — AI-POWERED FINANCE WORKFLOWS ══ -->
