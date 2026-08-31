@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="snowflake-source" content="cortex-agent-authored">
+<title>Office of the CFO with Snowflake</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sf-blue:#249EDC; --sf-mid:#11567F; --sf-deep:#042130;
+  --sf-ice:#F6F9FA; --sf-star:#71D3DC; --sf-orange:#FF9F36;
+  --text-dark:#111827; --text-gray:#4B5568; --text-light:#6B7280;
+  --border-card:rgba(204,204,204,0.5); --green:#16a34a; --amber:#D97706;
+  --red:#ef4444; --cyan:#29B5E8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#0a1628;display:flex;align-items:center;justify-content:center;}
+.deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex-shrink:0;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.6s cubic-bezier(0.4,0,0.2,1);overflow:hidden;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-bg{position:absolute;inset:0;z-index:0;}
+.bg-white{background:#FFFFFF;} .bg-ice{background:var(--sf-ice);} .bg-deep{background:var(--sf-deep);}
+.slide-content{position:relative;z-index:10;width:88%;max-width:1200px;padding:1.5rem 2rem 2rem;max-height:640px;overflow-y:auto;scrollbar-width:thin;}
+h1{font-size:clamp(2.8rem,5.5vw,5rem);font-weight:900;line-height:1.02;color:var(--text-dark);letter-spacing:-0.025em;}
+h2{font-size:clamp(1.7rem,3vw,2.8rem);font-weight:800;line-height:1.08;color:var(--text-dark);letter-spacing:-0.02em;margin-bottom:0.45rem;}
+h3.lbl{font-size:0.7rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--sf-blue);margin-bottom:0.65rem;}
+h3.lbl.purple{color:var(--sf-mid);}
+p{font-size:1rem;font-weight:300;line-height:1.65;color:var(--text-gray);max-width:720px;}
+.hi{color:var(--sf-blue);} .hip{color:var(--sf-mid);} .his{color:var(--sf-star);}
+.div{width:60px;height:3px;background:linear-gradient(90deg,var(--sf-blue),var(--sf-star));margin:0.7rem 0 0.9rem;border-radius:2px;}
+.divp{width:60px;height:3px;background:linear-gradient(90deg,var(--sf-mid),var(--sf-blue));margin:0.7rem 0 0.9rem;border-radius:2px;}
+.dark-slide h1,.dark-slide h2{color:#FFFFFF;}
+.dark-slide p{color:rgba(255,255,255,0.78);}
+.dark-slide h3.lbl{color:rgba(255,255,255,0.5);}
+.slide-number{position:absolute;bottom:1.5rem;right:1.8rem;font-size:0.7rem;color:var(--text-light);font-weight:500;letter-spacing:0.08em;z-index:20;}
+.dark-slide .slide-number{color:rgba(255,255,255,0.3);}
+.sf-logo{position:absolute;bottom:1.1rem;right:5.5rem;z-index:20;}
+.dark-slide .sf-logo img{filter:brightness(0) invert(1);opacity:0.65;}
+.progress-wrap{position:fixed;top:0;left:0;width:100%;height:3px;z-index:100;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--sf-mid),var(--sf-blue));transition:width 0.5s ease;width:5.6%;}
+.controls{position:fixed;bottom:1.8rem;left:50%;transform:translateX(-50%);display:flex;gap:0.7rem;z-index:100;align-items:center;}
+.ctrl-btn{background:#FFFFFF;border:1px solid var(--border-card);border-radius:999px;padding:0.4rem 1.2rem;color:var(--text-gray);font-size:0.76rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.04em;transition:all 0.18s;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.ctrl-btn:hover{background:var(--sf-ice);border-color:var(--sf-blue);color:var(--sf-mid);}
+select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-radius:999px;padding:0.4rem 1rem;color:var(--text-gray);font-size:0.74rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.deck-badge{position:fixed;top:0.5rem;left:50%;transform:translateX(-50%);z-index:200;background:rgba(17,86,127,0.1);border:1px solid rgba(17,86,127,0.3);border-radius:999px;padding:0.18rem 1rem;font-size:0.6rem;font-weight:700;color:var(--sf-mid);letter-spacing:0.1em;text-transform:uppercase;pointer-events:none;}
+.big-stat{font-size:clamp(2.8rem,5.5vw,5rem);font-weight:900;line-height:1;letter-spacing:-0.03em;}
+.stat-lbl{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-light);margin-top:0.25rem;}
+.pill{display:inline-block;background:rgba(36,158,220,0.1);border:1px solid rgba(36,158,220,0.3);border-radius:999px;padding:0.2rem 0.7rem;font-size:0.7rem;font-weight:600;color:var(--sf-blue);letter-spacing:0.04em;margin:0.12rem;}
+.pill.purple{background:rgba(17,86,127,0.08);border-color:rgba(17,86,127,0.3);color:var(--sf-mid);}
+.pill.amber{background:rgba(217,119,6,0.08);border-color:rgba(217,119,6,0.3);color:var(--amber);}
+.pill.red{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3);color:var(--red);}
+.pill.green{background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.3);color:var(--green);}
+</style>
+</head>
+<body>
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+<div class="deck-badge">Office of the CFO with Snowflake</div>
+<div class="deck" id="deck">
+
+<!-- ══ SLIDE 01 — TITLE ══ -->
+<div class="slide dark-slide active" id="slide-1">
+  <div class="slide-bg" style="background:var(--sf-deep);"></div>
+  <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(4,33,48,0.55) 0%,rgba(4,33,48,0.22) 60%,rgba(4,33,48,0.62) 100%);"></div>
+  <div class="slide-content" style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="display:block;filter:brightness(0) invert(1);opacity:0.9;">
+      <span style="color:rgba(255,255,255,0.25);">|</span>
+      <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.42);">CFO GTM &middot; EMEA</span>
+    </div>
+    <h1 style="text-align:center;color:var(--sf-star);font-size:clamp(2.4rem,5.5vw,5rem);margin-bottom:0.1rem;">OFFICE OF THE CFO</h1>
+    <h1 style="text-align:center;color:#FFFFFF;font-size:clamp(3rem,6vw,5.5rem);">WITH SNOWFLAKE</h1>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,var(--sf-blue),var(--sf-star));margin:1.2rem auto;border-radius:2px;"></div>
+    <p style="text-align:center;max-width:580px;font-size:1rem;color:rgba(255,255,255,0.65);">Discovery, positioning &amp; demo guidance for sales teams selling into the Office of the CFO.</p>
+    <p style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:1rem;">Mark Deprez &middot; Director GTM Strategy &mdash; CFO Office Transformation &middot; EMEA &middot; 2026</p>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24"></div>
+  <div class="slide-number">01 / 18</div>
+</div>
+
+<!-- ══ SLIDE 02 — WHY NOW ══ -->
+<div class="slide" id="slide-2">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content">
+    <h3 class="lbl purple">WHY NOW &middot; MARKET FORCES</h3>
+    <h2>Four forces creating <span class="hip">urgency in every CFO account</span></h2>
+    <div class="divp"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.9rem;margin-bottom:1rem;">
+      <div style="background:rgba(17,86,127,0.06);border:1px solid rgba(17,86,127,0.2);border-radius:14px;padding:0.9rem 1.1rem;text-align:center;">
+        <div class="big-stat" style="color:var(--sf-mid);">&gt;54%</div>
+        <div class="stat-lbl">of CFOs plan to implement Agentic AI in 2026</div>
+      </div>
+      <div style="background:rgba(180,83,9,0.06);border:1px solid rgba(180,83,9,0.2);border-radius:14px;padding:0.9rem 1.1rem;text-align:center;">
+        <div class="big-stat" style="color:#B45309;">70-80%</div>
+        <div class="stat-lbl">of finance time spent on data assembly, not insight</div>
+      </div>
+      <div style="background:rgba(36,158,220,0.06);border:1px solid rgba(36,158,220,0.2);border-radius:14px;padding:0.9rem 1.1rem;text-align:center;">
+        <div class="big-stat" style="color:var(--sf-blue);">31%</div>
+        <div class="stat-lbl">of finance teams seen as strategic partner</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div style="background:rgba(17,86,127,0.05);border:1px solid rgba(17,86,127,0.18);border-radius:12px;padding:0.9rem 1.1rem;">
+        <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--sf-mid);margin-bottom:0.55rem;">Why the timing is right</div>
+        <div style="display:flex;flex-direction:column;gap:0.38rem;">
+          <div style="display:flex;gap:0.55rem;align-items:flex-start;"><span style="color:var(--sf-blue);font-weight:700;flex-shrink:0;font-size:0.85rem;">&rarr;</span><span style="font-size:0.85rem;color:var(--text-gray);">EU AI Act enforcement begins August 2026 &mdash; CFOs need governed AI now</span></div>
+          <div style="display:flex;gap:0.55rem;align-items:flex-start;"><span style="color:var(--sf-blue);font-weight:700;flex-shrink:0;font-size:0.85rem;">&rarr;</span><span style="font-size:0.85rem;color:var(--text-gray);">Finance AI pilots stall before they scale &mdash; no shared truth, no context, no governance</span></div>
+          <div style="display:flex;gap:0.55rem;align-items:flex-start;"><span style="color:var(--sf-blue);font-weight:700;flex-shrink:0;font-size:0.85rem;">&rarr;</span><span style="font-size:0.85rem;color:var(--text-gray);">EPM displacement cycle is open &mdash; Anaplan, SAP BPC, Workday Adaptive contracts up for renewal</span></div>
+          <div style="display:flex;gap:0.55rem;align-items:flex-start;"><span style="color:var(--sf-blue);font-weight:700;flex-shrink:0;font-size:0.85rem;">&rarr;</span><span style="font-size:0.85rem;color:var(--text-gray);">CFO as enterprise architect &mdash; increasingly owns the data strategy, not just the reporting stack</span></div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(160deg,rgba(17,86,127,0.05),rgba(17,86,127,0.02));border:1.5px solid rgba(17,86,127,0.2);border-radius:12px;padding:0.9rem 1.1rem;display:flex;flex-direction:column;justify-content:center;text-align:center;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--sf-mid);margin-bottom:0.5rem;">Bottom Line</div>
+        <p style="font-size:0.82rem;color:var(--text-gray);margin:0;max-width:100%;"><strong style="color:var(--sf-mid);">Every one of these forces points to a data problem that Snowflake solves.</strong> The CFO has the budget and the mandate. Your job is to connect the pain to the platform.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">02 / 18</div>
+</div>
+
+<!-- ══ SLIDE 03 — THE PROBLEM ══ -->
+<div class="slide" id="slide-3">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl">THE PROBLEM &middot; LEGACY PLATFORMS</h3>
+    <h2>Legacy platforms create <span class="hi">data challenges</span> across the CFO org</h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
+      <div style="background:rgba(239,68,68,0.04);border:1.5px solid rgba(239,68,68,0.2);border-radius:14px;padding:1rem;text-align:center;">
+        <div style="font-size:0.9rem;font-weight:800;color:var(--red);margin-bottom:0.4rem;">Fragmented Data</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Siloed storage, multiple processing engines, fragmented governance. FP&amp;A, Accounting, Tax have no unified view.</p>
+      </div>
+      <div style="background:rgba(239,68,68,0.04);border:1.5px solid rgba(239,68,68,0.2);border-radius:14px;padding:1rem;text-align:center;">
+        <div style="font-size:0.9rem;font-weight:800;color:var(--red);margin-bottom:0.4rem;">Manual Work</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Excel-driven financial operations. Slow month-end close, prone to human error. 50+ spreadsheets per process.</p>
+      </div>
+      <div style="background:rgba(239,68,68,0.04);border:1.5px solid rgba(239,68,68,0.2);border-radius:14px;padding:1rem;text-align:center;">
+        <div style="font-size:0.9rem;font-weight:800;color:var(--red);margin-bottom:0.4rem;">Slow Time-to-Insight</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Unconnected business systems. Siloed decision-making. Reporting cycles measured in weeks, not hours.</p>
+      </div>
+      <div style="background:rgba(239,68,68,0.04);border:1.5px solid rgba(239,68,68,0.2);border-radius:14px;padding:1rem;text-align:center;">
+        <div style="font-size:0.9rem;font-weight:800;color:var(--red);margin-bottom:0.4rem;">Compliance Risk</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">SOX, GDPR, EU AI Act. Sensitive data scattered across manual reports and uncontrolled spreadsheets.</p>
+      </div>
+    </div>
+    <div style="background:rgba(17,86,127,0.05);border:1.5px solid rgba(17,86,127,0.2);border-radius:12px;padding:0.8rem 1.1rem;">
+      <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:0.4rem;">Enterprise Value Impact</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.8rem;">
+        <div style="text-align:center;"><p style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin:0;">Erodes Margin</p><p style="font-size:0.72rem;color:var(--text-light);margin:0;">Accounting latency &amp; reconciliation gaps</p></div>
+        <div style="text-align:center;"><p style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin:0;">Obscures Liquidity</p><p style="font-size:0.72rem;color:var(--text-light);margin:0;">Defensive buffers trap working capital</p></div>
+        <div style="text-align:center;"><p style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin:0;">Slows Innovation</p><p style="font-size:0.72rem;color:var(--text-light);margin:0;">Legacy systems block modern AI capabilities</p></div>
+        <div style="text-align:center;"><p style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin:0;">Governance Risk</p><p style="font-size:0.72rem;color:var(--text-light);margin:0;">No unified data perimeter for audit trail</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">03 / 18</div>
+</div>
+
+<!-- ══ SLIDE 04 — CFO PERSONAS ══ -->
+<div class="slide" id="slide-4">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content">
+    <h3 class="lbl purple">THE PERSONAS &middot; WHO TO CALL ON</h3>
+    <h2>Six buyers in the <span class="hip">Office of the CFO</span></h2>
+    <div class="divp"></div>
+    <div style="margin-bottom:0.65rem;">
+      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(17,86,127,0.5);margin-bottom:0.35rem;padding-left:0.2rem;">Executive layer &mdash; economic buyer + strategic sponsor</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.55rem;">
+        <div style="background:rgba(17,86,127,0.06);border:1.5px solid rgba(17,86,127,0.28);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#11567F;margin-bottom:0.2rem;">&#128200; FP&amp;A</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">Scenario planning, budgeting, variance analysis. Owns the forecast. Frustrated by overnight pipeline runs.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:#11567F;background:rgba(17,86,127,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: forecast, variance, scenario</div>
+        </div>
+        <div style="background:rgba(217,119,6,0.06);border:1.5px solid rgba(217,119,6,0.28);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#D97706;margin-bottom:0.2rem;">&#128176; Treasury</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">Cash forecasting, liquidity management, FX exposure. Needs real-time deviation alerts, not month-end reports.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:#D97706;background:rgba(217,119,6,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: cash, liquidity, FX risk</div>
+        </div>
+        <div style="background:rgba(13,148,136,0.06);border:1.5px solid rgba(13,148,136,0.28);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#0d9488;margin-bottom:0.2rem;">&#128221; Accounting</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">Close cycle, reconciliation, journal entries. Wants automated GL flux analysis and audit-ready output.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:#0d9488;background:rgba(13,148,136,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: close, recon, audit</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:0.65rem;">
+      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(36,158,220,0.5);margin-bottom:0.35rem;padding-left:0.2rem;">Operations layer &mdash; process owners</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.55rem;">
+        <div style="background:rgba(36,158,220,0.05);border:1.5px solid rgba(36,158,220,0.3);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#249EDC;margin-bottom:0.2rem;">&#128214; Tax &amp; Compliance</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">Transfer pricing, CSRD/ESRS, EU Taxonomy. Needs financial + ESG data in one governed system.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);background:rgba(36,158,220,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: compliance, tax automation</div>
+        </div>
+        <div style="background:rgba(139,92,246,0.05);border:1.5px solid rgba(139,92,246,0.3);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#8b5cf6;margin-bottom:0.2rem;">&#127919; Corporate Strategy</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">M&amp;A modelling, CapEx programme management. Needs interconnected impact analysis in hours, not months.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:#8b5cf6;background:rgba(139,92,246,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: M&amp;A, CapEx, impact</div>
+        </div>
+        <div style="background:rgba(236,72,153,0.05);border:1.5px solid rgba(236,72,153,0.3);border-radius:10px;padding:0.7rem 0.85rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:#ec4899;margin-bottom:0.2rem;">&#128270; Internal Audit</div>
+          <p style="font-size:0.78rem;color:var(--text-gray);margin:0 0 0.3rem;max-width:100%;">Continuous controls monitoring, SOX testing. Wants to move from sampling to proactive assurance.</p>
+          <div style="font-size:0.68rem;font-weight:600;color:#ec4899;background:rgba(236,72,153,0.07);border-radius:4px;padding:0.2rem 0.45rem;display:inline-block;">Language: controls, SOX, assurance</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(17,86,127,0.05);border-left:3px solid var(--sf-mid);border-radius:0 8px 8px 0;padding:0.45rem 0.75rem;">
+      <p style="font-size:0.76rem;font-weight:600;color:var(--sf-mid);margin:0;max-width:100%;">Key insight: "Who in my finance team actually uses this?" &mdash; Always map capabilities to specific personas, not generic "finance teams."</p>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">04 / 18</div>
+</div>
+
+<!-- ══ SLIDE 05 — CORTEX AI ARCHITECTURE ══ -->
+<div class="slide" id="slide-5">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl">THE PLATFORM &middot; CORTEX AI</h3>
+    <h2>One platform to power <span class="hi">your entire Finance AI strategy</span></h2>
+    <div class="div"></div>
+    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 1rem;border-radius:8px;background:rgba(36,158,220,0.1);border:1.5px solid rgba(36,158,220,0.3);">
+        <div style="color:var(--sf-blue);font-weight:700;font-size:0.8rem;min-width:100px;">APPS</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;"><span class="pill">CoWork Intelligence</span><span class="pill">Cortex Code (CoCo)</span><span class="pill">Snowflake Apps</span><span class="pill">Streamlit</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 1rem;border-radius:8px;background:rgba(36,158,220,0.07);border:1.5px solid rgba(36,158,220,0.22);">
+        <div style="color:var(--sf-blue);font-weight:700;font-size:0.8rem;min-width:100px;">APIS</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;"><span class="pill">Cortex Agents</span><span class="pill">Cortex AI Functions</span><span class="pill">Cortex Analyst</span><span class="pill">Cortex ML</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 1rem;border-radius:8px;background:rgba(36,158,220,0.04);border:1.5px solid rgba(36,158,220,0.15);">
+        <div style="color:var(--sf-mid);font-weight:700;font-size:0.8rem;min-width:100px;">CONTEXT</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;"><span class="pill purple">Semantic Views</span><span class="pill purple">MCP Connectors</span><span class="pill purple">Business Logic</span><span class="pill purple">Marketplace Data</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;padding:0.7rem 1rem;border-radius:8px;background:rgba(17,86,127,0.04);border:1.5px solid rgba(17,86,127,0.15);">
+        <div style="color:var(--sf-mid);font-weight:700;font-size:0.8rem;min-width:100px;">GOVERNANCE</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;"><span class="pill purple">RBAC + Column Masking</span><span class="pill purple">Audit &amp; Lineage</span><span class="pill purple">Verified Queries</span><span class="pill purple">SOX / GDPR / EU AI Act</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.8rem;">
+      <div style="text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:var(--sf-blue);">12,600+</div><div style="font-size:0.65rem;color:var(--text-light);font-weight:600;">Customers</div></div>
+      <div style="text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:var(--sf-mid);">765+</div><div style="font-size:0.65rem;color:var(--text-light);font-weight:600;">Forbes Global 2000</div></div>
+      <div style="text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:var(--sf-blue);">7,300+</div><div style="font-size:0.65rem;color:var(--text-light);font-weight:600;">Weekly AI customers</div></div>
+      <div style="text-align:center;"><div style="font-size:1.4rem;font-weight:900;color:var(--sf-mid);">51</div><div style="font-size:0.65rem;color:var(--text-light);font-weight:600;">Cloud regions</div></div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">05 / 18</div>
+</div>
+
+<!-- ══ SLIDE 06 — AI-POWERED FINANCE WORKFLOWS ══ -->
+<div class="slide" id="slide-6">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content">
+    <h3 class="lbl">BUSINESS OUTCOMES &middot; USE CASES</h3>
+    <h2>AI-Powered <span class="hi">Finance Workflows</span></h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">Cloud Spend Management</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Cross-functional visibility into Cloud COGS. Agentic skills for trends, attribution, forecasting. Identify savings, maximise margins.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">Cortex Agent</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">T&amp;E Spend Management</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Unified Navan + Workday data. Spend analytics, compliance monitoring, supplier performance. Persona-based entitlements.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">Cortex Agent + Slack</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">Continuous Controls</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Move from sampling to proactive assurance. Access termination, journal entry monitoring, configuration compliance.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">Cortex ML + Anomaly</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">GL Flux &amp; Reconciliation</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Automated period-over-period variance across thousands of GL accounts. Eliminate manual spreadsheet comparisons.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">Cortex Analyst</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">Earnings Prep</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Two parallel AI agents: Earnings Agent predicts analyst questions, IR Agent generates data-driven answers. 50 spreadsheets &rarr; 1.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">Cortex Agent</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">FP&amp;A &amp; Scenario Planning</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">SnowPlan: parameterised macro scenarios in real-time. Change one input, cascade through EBITDA by segment to net debt.</p>
+        <div style="margin-top:0.4rem;"><span class="pill" style="font-size:0.6rem;">SnowPlan + Cortex ML</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">06 / 18</div>
+</div>
+
+<!-- ══ SLIDE 07 — SNOW-ON-SNOW: SNOWHOUSE ══ -->
+<div class="slide dark-slide" id="slide-7">
+  <div class="slide-bg" style="background:linear-gradient(160deg,#042130 0%,#0d3151 60%,#11567F 100%);"></div>
+  <div style="position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 30% 60%,rgba(36,158,220,0.1) 0%,rgba(4,33,48,0) 65%);"></div>
+  <div class="slide-content">
+    <h3 class="lbl" style="color:rgba(113,211,220,0.75);">WE DRINK OUR OWN CHAMPAGNE</h3>
+    <h2 style="color:#FFFFFF;">Snowflake <span style="color:var(--sf-star);">on Snowflake</span></h2>
+    <div style="width:60px;height:3px;background:rgba(255,255,255,0.2);margin:0.6rem 0 0.8rem;border-radius:2px;"></div>
+    <p style="color:rgba(255,255,255,0.65);margin-bottom:0.8rem;max-width:100%;">"Snowhouse" &mdash; our internal finance platform powering 6 AI agents in production</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
+      <div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.8rem;">
+        <div style="font-size:2.5rem;font-weight:900;color:var(--sf-star);line-height:1;">6</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Finance AI agents<br>in production today</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.8rem;">
+        <div style="font-size:2.5rem;font-weight:900;color:var(--sf-star);line-height:1;">50&rarr;1</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Excel sheets eliminated<br>(10-year planning)</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.8rem;">
+        <div style="font-size:1.8rem;font-weight:900;color:var(--sf-star);line-height:1;">2wk&rarr;48h</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Earnings cycle<br>turnaround</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.8rem;">
+        <div style="font-size:2.5rem;font-weight:900;color:var(--sf-star);line-height:1;">Daily</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">Re-forecast of revenue,<br>bookings, billings, COGS</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div>
+        <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:0.35rem;">Source Systems &rarr; Snowhouse</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.25rem;">
+          <span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">Workday</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">FloQast</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">Blackline</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">RightRev</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">Salesforce</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">Zip</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">ServiceNow</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">CrowdStrike</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">Okta</span><span class="pill" style="font-size:0.6rem;background:rgba(113,211,220,0.1);border-color:rgba(113,211,220,0.3);color:var(--sf-star);">GitHub</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:0.35rem;">Output Layer</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.25rem;">
+          <span class="pill green" style="font-size:0.6rem;">Streamlit Apps</span><span class="pill green" style="font-size:0.6rem;">CoWork Intelligence</span><span class="pill green" style="font-size:0.6rem;">Cortex Agents</span><span class="pill green" style="font-size:0.6rem;">Cortex Code</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:0.8rem;padding:0.5rem 0.8rem;background:rgba(113,211,220,0.07);border:1px solid rgba(113,211,220,0.2);border-radius:8px;">
+      <p style="font-size:0.78rem;color:rgba(255,255,255,0.6);margin:0;max-width:100%;font-style:italic;">"Our Finance responsibilities extend beyond reporting numbers. It's an opportunity to partner with the business in decision making." &mdash; Snowflake Finance</p>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22"></div>
+  <div class="slide-number">07 / 18</div>
+</div>
+
+<!-- ══ SLIDE 08 — 6 FINANCE AI AGENTS ══ -->
+<div class="slide" id="slide-8">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl purple">SNOW-ON-SNOW &middot; 6 AGENTS IN PRODUCTION</h3>
+    <h2>The agents <span class="hip">running today</span></h2>
+    <div class="divp"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.65rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#129302; RevOps AI Agent</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">Order to Cash</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">Answers Sales questions about policies, attainment, rules &amp; accounts. Handles Elementum billing cases &amp; intelligent contract review.</p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Agent + Slack</span>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#128209; Abacus / Accounting</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">GL &amp; Accounting</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">AI-powered GL automation. SnowFin Journals (automated entries) and SnowFin Recons (cross-system reconciliation).</p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Agent</span>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#9881;&#65039; SnowFin Ops (FinE)</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">Operational Finance</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">Workflow automation, Cloud Spend Management, cross-functional process orchestration. Integrates Blackline, Fidelity, Gappify.</p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Agent</span>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#9992;&#65039; T&amp;E Agent</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">Procure to Pay</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">Travel &amp; expense automation with Slack notifications. AP Executive Dashboard (Global T&amp;E, Vendor 360, CC Transaction Aging).</p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Agent + Slack</span>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#128200; Prism / Forecast</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">FP&amp;A</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">Automated revenue forecasting (daily re-forecast). Feeds SnowPlan &amp; 10-year planning module. <strong style="color:var(--sf-mid);">50+ Excel sheets &rarr; 1 analyst.</strong></p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Analyst + ML</span>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.2rem;">&#128196; Exemption Certificate</div>
+        <div style="font-size:0.68rem;font-weight:600;color:var(--sf-blue);margin-bottom:0.3rem;">Tax</div>
+        <p style="font-size:0.76rem;margin:0 0 0.3rem;max-width:100%;">Automated tax compliance. Indirect Tax Dashboard, sales tax check automation, VAT analysis &amp; anomaly detection.</p>
+        <span class="pill" style="font-size:0.58rem;">Cortex Agent</span>
+      </div>
+    </div>
+    <div style="margin-top:0.6rem;background:rgba(36,158,220,0.05);border:1px solid rgba(36,158,220,0.2);border-radius:8px;padding:0.4rem 0.8rem;">
+      <p style="font-size:0.72rem;color:var(--text-light);margin:0;max-width:100%;">Architecture: Source Systems &rarr; Snowhouse (centralised DW) &rarr; Semantic Views + Cortex Analyst &rarr; Cortex Agents + Snowflake Intelligence</p>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22" style="opacity:0.85;"></div>
+  <div class="slide-number">08 / 18</div>
+</div>
+
+<!-- ══ SLIDE 09 — CUSTOMER PROOF POINTS ══ -->
+<div class="slide" id="slide-9">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content" style="padding-top:1.8rem;padding-bottom:1.8rem;">
+    <h3 class="lbl purple">PROOF POINTS &middot; CUSTOMER RESULTS</h3>
+    <h2>Real outcomes from <span class="hip">real CFO deployments</span></h2>
+    <div class="divp"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--sf-mid);margin-bottom:0.2rem;">6 wks &rarr; 6 days</div>
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text-dark);margin-bottom:0.2rem;">DWS Group</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Cost-income ratio planning cycle compressed from 6 weeks to 6 days with Snowflake + Cortex AI. Board-ready output, automated data assembly.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--sf-blue);margin-bottom:0.2rem;">$12M+ annual savings</div>
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text-dark);margin-bottom:0.2rem;">M&amp;T Bank</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Finance and liquidity risk analytics modernised. Migrated from Hadoop in 8 months (vs. typical 12-16). 30-50% operating cost reduction.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(13,148,136,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:1.4rem;font-weight:900;color:#0d9488;margin-bottom:0.2rem;">34 &rarr; ~1 incidents/mo</div>
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text-dark);margin-bottom:0.2rem;">DoorDash</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Centralised 35-50 disconnected systems. 5-minute data refresh. Auditor meetings from hours to ~10 minutes.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(180,83,9,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:1.4rem;font-weight:900;color:#B45309;margin-bottom:0.2rem;">3x faster forecasting</div>
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text-dark);margin-bottom:0.2rem;">WHOOP</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">AI/ML financial forecasting model built with Snowpark. Single source of truth replacing fragmented data across multiple systems.</p>
+      </div>
+    </div>
+    <div style="background:rgba(36,158,220,0.06);border:1px solid rgba(36,158,220,0.22);border-radius:8px;padding:0.5rem 0.8rem;">
+      <p style="font-size:0.78rem;color:var(--sf-mid);margin:0;max-width:100%;"><strong>Also reference:</strong> Ericsson (variance analysis: hours &rarr; seconds) &middot; PMI (17 &rarr; 4 analysts, $600K savings) &middot; Snowflake-on-Snowflake (50 &rarr; 1 spreadsheets)</p>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">09 / 18</div>
+</div>
+
+<!-- ══ SLIDE 10 — PERSONA LANGUAGE GUIDE ══ -->
+<div class="slide" id="slide-10">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl">PERSONAS &middot; WHAT TO SAY</h3>
+    <h2>Speak their language. Every persona has <span class="hi">one thing</span> they measure.</h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.9rem 1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.45rem;">
+          <div style="font-size:0.88rem;font-weight:800;color:#11567F;">&#128200; FP&amp;A Leader</div>
+          <span class="pill purple" style="font-size:0.6rem;">Exec sponsor</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-size:0.78rem;">
+          <div><span style="font-weight:700;color:#11567F;">Metric:</span><span style="color:var(--text-gray);"> Forecast accuracy, variance analysis cycle time</span></div>
+          <div><span style="font-weight:700;color:#11567F;">Fear:</span><span style="color:var(--text-gray);"> Overnight pipeline runs, stale numbers in the board pack</span></div>
+          <div style="grid-column:1/-1;"><span style="font-weight:700;color:#11567F;">Your message:</span><span style="color:var(--text-gray);"> "What if your forecast updated daily instead of monthly &mdash; and every number was traceable to source?"</span></div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(217,119,6,0.3);border-radius:12px;padding:0.9rem 1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.45rem;">
+          <div style="font-size:0.88rem;font-weight:800;color:#D97706;">&#128176; Treasurer</div>
+          <span class="pill amber" style="font-size:0.6rem;">Exec buyer</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-size:0.78rem;">
+          <div><span style="font-weight:700;color:var(--amber);">Metric:</span><span style="color:var(--text-gray);"> Cash forecast accuracy, FX exposure, liquidity ratio</span></div>
+          <div><span style="font-weight:700;color:var(--amber);">Fear:</span><span style="color:var(--text-gray);"> Excess defensive buffers; can't see cash position in real-time</span></div>
+          <div style="grid-column:1/-1;"><span style="font-weight:700;color:var(--amber);">Your message:</span><span style="color:var(--text-gray);"> "How much working capital is trapped because you can't see your cash position until month-end?"</span></div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(13,148,136,0.28);border-radius:12px;padding:0.9rem 1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.45rem;">
+          <div style="font-size:0.88rem;font-weight:800;color:#0d9488;">&#128221; Controller / Accounting</div>
+          <span class="pill" style="font-size:0.6rem;background:rgba(13,148,136,0.08);border-color:rgba(13,148,136,0.3);color:#0d9488;">Process owner</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-size:0.78rem;">
+          <div><span style="font-weight:700;color:#0d9488;">Metric:</span><span style="color:var(--text-gray);"> Close cycle time, recon exceptions, audit findings</span></div>
+          <div><span style="font-weight:700;color:#0d9488;">Fear:</span><span style="color:var(--text-gray);"> Material weakness, auditor surprises, manual journal errors</span></div>
+          <div style="grid-column:1/-1;"><span style="font-weight:700;color:#0d9488;">Your message:</span><span style="color:var(--text-gray);"> "Your auditors, your treasury team, and your IR team all look at the same number. There is no reconciliation step."</span></div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(139,92,246,0.28);border-radius:12px;padding:0.9rem 1.1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.45rem;">
+          <div style="font-size:0.88rem;font-weight:800;color:#8b5cf6;">&#128214; Tax &amp; Compliance</div>
+          <span class="pill" style="font-size:0.6rem;background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.3);color:#8b5cf6;">Compliance</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-size:0.78rem;">
+          <div><span style="font-weight:700;color:#8b5cf6;">Metric:</span><span style="color:var(--text-gray);"> Tax compliance rate, CSRD readiness, transfer pricing accuracy</span></div>
+          <div><span style="font-weight:700;color:#8b5cf6;">Fear:</span><span style="color:var(--text-gray);"> EU AI Act non-compliance, CSRD data gaps, manual reporting errors</span></div>
+          <div style="grid-column:1/-1;"><span style="font-weight:700;color:#8b5cf6;">Your message:</span><span style="color:var(--text-gray);"> "Financial and ESG data in one governed system &mdash; with the audit trail to prove it."</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22" style="opacity:0.85;"></div>
+  <div class="slide-number">10 / 18</div>
+</div>
+
+<!-- ══ SLIDE 11 — DISCOVERY QUESTIONS ══ -->
+<div class="slide" id="slide-11">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content">
+    <h3 class="lbl purple">DISCOVERY &middot; 8 QUESTION CLUSTERS</h3>
+    <h2>CFO <span class="hip">Discovery Questions</span></h2>
+    <div class="divp"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">1. Scenario Planning &amp; Volatility</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"Can your platform run 10-15 macro scenarios simultaneously and update group EBITDA in real time?" &mdash; Lead with their specific macro drivers.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">2. Group Consolidation</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"How does this ingest from SAP, Oracle, and legacy systems without a 3-year migration?" &mdash; Show multi-source ingestion, entity hierarchy.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">3. CapEx Programme Management</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"I need one dashboard: spend vs. budget, completion date, financing drawdown, P&amp;L impact." &mdash; Show cascading impact.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">4. ESG &amp; CSRD Reporting</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"CSRD made me legally responsible for ESG data with same accountability as financial data." &mdash; Show financial + ESG in one system.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">5. Data Unification / Platform</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"We already have [Microsoft/SAP/Oracle]. Convince me in 2 minutes." &mdash; Snowflake is data foundation, not competitor.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">6. AI &amp; Autonomous Analytics</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"Is the AI making decisions, or surfacing options for humans?" &mdash; Human-in-the-loop for critical infrastructure. Show reasoning chain.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">7. Data Sovereignty &amp; Compliance</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"Does Snowflake guarantee my data stays in EU?" &mdash; EU residency, RBAC demo (3 roles), SOX/GDPR/NIS2 compliance pack.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.25);border-radius:10px;padding:0.7rem 0.9rem;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--sf-blue);margin-bottom:0.25rem;">8. Commercial Realism</div>
+        <p style="font-size:0.74rem;margin:0;max-width:100%;">"What does this actually cost? How long until first value? Give me one reference I can call." &mdash; Have a TCO range and 180-day timeline.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22" style="opacity:0.85;"></div>
+  <div class="slide-number">11 / 18</div>
+</div>
+
+<!-- ══ SLIDE 12 — OBJECTION HANDLING ══ -->
+<div class="slide" id="slide-12">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl">OBJECTIONS &middot; REFRAMES</h3>
+    <h2>Top CFO <span class="hi">Objections</span> &amp; how to reframe them</h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(239,68,68,0.2);border-radius:12px;padding:0.9rem 1rem;">
+        <p style="font-size:0.8rem;font-style:italic;color:var(--red);margin:0 0 0.4rem;max-width:100%;">"We already have Microsoft Copilot / Fabric"</p>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;"><strong style="color:var(--sf-blue);">Reframe:</strong> Snowflake is the data foundation. Copilot is the productivity layer on top. Copilot without unified, governed data is expensive autocomplete. Show: Sources &rarr; Snowflake &rarr; Copilot.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(239,68,68,0.2);border-radius:12px;padding:0.9rem 1rem;">
+        <p style="font-size:0.8rem;font-style:italic;color:var(--red);margin:0 0 0.4rem;max-width:100%;">"We already have an EPM (Anaplan/SAP BPC)"</p>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;"><strong style="color:var(--sf-blue);">Reframe:</strong> EPM manages the planning process. Snowflake makes the data underneath trustworthy, real-time, and AI-ready. SnowPlan can replace &mdash; or Snowflake enriches the EPM they keep.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(239,68,68,0.2);border-radius:12px;padding:0.9rem 1rem;">
+        <p style="font-size:0.8rem;font-style:italic;color:var(--red);margin:0 0 0.4rem;max-width:100%;">"Our CFO is data-sceptical"</p>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;"><strong style="color:var(--sf-blue);">Approach:</strong> Lead with account-specific numbers. Show ONE compelling use case. Prepare a 'first 180 days' timeline. Have a reference the CFO can call. Honesty &gt; polish.</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(239,68,68,0.2);border-radius:12px;padding:0.9rem 1rem;">
+        <p style="font-size:0.8rem;font-style:italic;color:var(--red);margin:0 0 0.4rem;max-width:100%;">"The AI might hallucinate on financial data"</p>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;"><strong style="color:var(--sf-blue);">Answer:</strong> Acknowledge it. Then: data grounding, Verified Queries, confidence thresholds, audit logs. "The AI surfaces the question. You make the decision. The data is yours, governed, auditable."</p>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22" style="opacity:0.85;"></div>
+  <div class="slide-number">12 / 18</div>
+</div>
+
+<!-- ══ SLIDE 13 — FINANCE-GRADE GOVERNANCE ══ -->
+<div class="slide dark-slide" id="slide-13">
+  <div class="slide-bg" style="background:var(--sf-deep);"></div>
+  <div style="position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 80% 30%,rgba(113,211,220,0.1) 0%,transparent 60%);"></div>
+  <div class="slide-content">
+    <h3 class="lbl" style="color:rgba(113,211,220,0.75);">GOVERNANCE &middot; THE #1 CFO DIFFERENTIATOR</h3>
+    <h2 style="color:#FFFFFF;">Finance-Grade <span style="color:var(--sf-star);">Governance</span></h2>
+    <div style="width:60px;height:3px;background:rgba(255,255,255,0.2);margin:0.6rem 0 0.8rem;border-radius:2px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
+      <div style="background:rgba(22,163,74,0.08);border:1.5px solid rgba(22,163,74,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--green);margin-bottom:0.3rem;">No Data Movement</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Data stays where it is. Governed in place. No copies. No shadow spreadsheets. Single source of truth.</p>
+      </div>
+      <div style="background:rgba(22,163,74,0.08);border:1.5px solid rgba(22,163,74,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--green);margin-bottom:0.3rem;">Multi-Layer RBAC</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Data RBAC + Feature/Model RBAC + Agent RBAC. Column-level masking. Lithuanian CFO sees Lithuania. Group CFO sees everything.</p>
+      </div>
+      <div style="background:rgba(22,163,74,0.08);border:1.5px solid rgba(22,163,74,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--green);margin-bottom:0.3rem;">Full Audit Trail</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Every query, every access, every lineage traced. SOX-ready. GDPR-compliant. EU AI Act Aug 2026 compliant. Auditor read-only access.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+      <div style="background:rgba(113,211,220,0.08);border:1.5px solid rgba(113,211,220,0.25);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-star);margin-bottom:0.3rem;">Verified Queries</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Transparent SQL behind every AI answer. "How was this generated?" shows data source, filters, and logic chain. Builds CFO trust.</p>
+      </div>
+      <div style="background:rgba(113,211,220,0.08);border:1.5px solid rgba(113,211,220,0.25);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-star);margin-bottom:0.3rem;">Observability &amp; Guardrails</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Confidence scores on every AI output. Human-in-the-loop approval for critical decisions. Explainability for board-level reporting.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22"></div>
+  <div class="slide-number">13 / 18</div>
+</div>
+
+<!-- ══ SLIDE 14 — EPM DISPLACEMENT / SNOWPLAN ══ -->
+<div class="slide dark-slide" id="slide-14">
+  <div class="slide-bg" style="background:linear-gradient(160deg,#042130 0%,#0d3151 60%,#11567F 100%);"></div>
+  <div style="position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 75% 25%,rgba(113,211,220,0.1) 0%,transparent 60%);"></div>
+  <div class="slide-content">
+    <h3 class="lbl" style="color:rgba(113,211,220,0.75);">TAKE-OUT SAAS &middot; THE DISPLACEMENT PLAY</h3>
+    <h2 style="color:#FFFFFF;">The EPM <span style="color:var(--sf-star);">displacement play</span></h2>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,var(--sf-star),rgba(113,211,220,0.3));margin:0.6rem 0 0.8rem;border-radius:2px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
+      <div style="background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.28);border-radius:12px;padding:0.85rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:#f87171;margin-bottom:0.3rem;">Displace</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Anaplan &middot; SAP BPC/BW &middot; Workday Adaptive &middot; Oracle PBCS. Contracts up for renewal across EMEA. Customers frustrated with seat-based pricing, limited AI.</p>
+      </div>
+      <div style="background:rgba(113,211,220,0.08);border:1.5px solid rgba(113,211,220,0.3);border-radius:12px;padding:0.85rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-star);margin-bottom:0.3rem;">SnowPlan</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">AI-native FP&amp;A on Snowflake. Consumption-based pricing. Built on governed data. Cortex AI for NL queries, scenario modelling, anomaly detection.</p>
+        <div style="margin-top:0.3rem;"><span class="pill green" style="font-size:0.6rem;">Finance Decision Fabric</span></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:0.85rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:rgba(255,255,255,0.85);margin-bottom:0.3rem;">Coexist</div>
+        <p style="font-size:0.78rem;margin:0;max-width:100%;">Not every customer will rip and replace. Snowflake enriches the EPM they keep &mdash; unified data layer underneath, marketplace data, AI on top.</p>
+        <div style="margin-top:0.3rem;"><span class="pill" style="font-size:0.6rem;">Land &amp; Expand</span></div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.7rem 1rem;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.35rem;">How to spot the opportunity</div>
+      <div style="display:flex;flex-direction:column;gap:0.3rem;">
+        <div style="display:flex;gap:0.45rem;"><span style="color:var(--sf-star);font-weight:700;">1.</span><span style="font-size:0.78rem;color:rgba(255,255,255,0.65);">Anaplan / Workday Adaptive / SAP BPC renewal in next 12 months</span></div>
+        <div style="display:flex;gap:0.45rem;"><span style="color:var(--sf-star);font-weight:700;">2.</span><span style="font-size:0.78rem;color:rgba(255,255,255,0.65);">CFO frustrated with seat-based pricing and limited AI capabilities</span></div>
+        <div style="display:flex;gap:0.45rem;"><span style="color:var(--sf-star);font-weight:700;">3.</span><span style="font-size:0.78rem;color:rgba(255,255,255,0.65);">Stalled planning programme &mdash; model was built, nobody trusts the output</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22"></div>
+  <div class="slide-number">14 / 18</div>
+</div>
+
+<!-- ══ SLIDE 15 — CFO CONSUMPTION MAP ══ -->
+<div class="slide" id="slide-15">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content" style="padding-top:1.8rem;padding-bottom:1.8rem;">
+    <h3 class="lbl">QUOTA RETIREMENT &middot; CONSUMPTION MAP</h3>
+    <h2>How CFO Workloads <span class="hi">Drive Snowflake Consumption</span></h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;align-items:stretch;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.35);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">Data Ingestion &amp; Storage</div>
+          <span class="pill" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">High Volume</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">Snowpipe + Dynamic Tables stream ERP, GL, AP/AR, and T&amp;E data continuously. Finance data is multi-source and high-frequency. Storage + continuous compute = baseline consumption.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">Snowpipe</span><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">Dynamic Tables</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.35);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">Cortex AI &mdash; Forecasting &amp; ML</div>
+          <span class="pill" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">High Value</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">Revenue forecasting retrains on every signal. Anomaly detection for controls monitoring. Each model training and inference cycle = compute credits.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">Cortex ML</span><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">AI Functions</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.35);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">Cortex Analyst &mdash; Self-Service</div>
+          <span class="pill" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">User Growth</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">Every finance query that used to take days via IT ticket now runs in seconds. Board packs on demand. More users = more compute. Scales with adoption.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">Cortex Analyst</span><span style="font-size:0.62rem;background:rgba(36,158,220,0.08);border:1px solid rgba(36,158,220,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-blue);font-weight:600;">Compute</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">Cortex Agents &mdash; Always-On</div>
+          <span class="pill purple" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">AI Premium</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">Always-on agents for T&amp;E, RevOps, controls monitoring. Each agent run = LLM tokens + compute. More automation = more consumption. Highest-value driver.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">Cortex Agents</span><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">LLM Tokens</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">Marketplace &mdash; External Data</div>
+          <span class="pill purple" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">Enrichment</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">S&amp;P Global, FactSet, MSCI, LSEG, Deutsche B&ouml;rse. SaaS connectors: Coupa, Zuora, Stripe, SAP, Salesforce, NetSuite. Each subscription = ARR.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">Marketplace</span><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">Data Providers</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(17,86,127,0.25);border-radius:12px;padding:0.9rem 1rem;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+          <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);">SnowPlan &mdash; EPM Replacement</div>
+          <span class="pill purple" style="font-size:0.6rem;margin:0;padding:0.15rem 0.55rem;">Take-Out</span>
+        </div>
+        <p style="font-size:0.78rem;margin-bottom:0.5rem;flex:1;">Full FP&amp;A on Snowflake. Consumption-based pricing replaces seat-based. Scenario modelling, forecasting, board packs all on one platform. Net-new workload.</p>
+        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;"><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">SnowPlan</span><span style="font-size:0.62rem;background:rgba(17,86,127,0.08);border:1px solid rgba(17,86,127,0.2);border-radius:4px;padding:0.12rem 0.4rem;color:var(--sf-mid);font-weight:600;">Net New ARR</span></div>
+      </div>
+    </div>
+    <div style="margin-top:0.7rem;background:linear-gradient(90deg,rgba(36,158,220,0.07),rgba(113,211,220,0.04));border:1px solid rgba(36,158,220,0.22);border-radius:10px;padding:0.6rem 1.1rem;">
+      <p style="font-size:0.79rem;color:var(--text-gray);margin:0;max-width:100%;"><strong style="color:var(--sf-mid);">Why CFO deals compound:</strong> A customer starts with data ingestion, adds forecasting, then self-service analytics, then agents, then SnowPlan. ARR grows with every capability layer.</p>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">15 / 18</div>
+</div>
+
+<!-- ══ SLIDE 16 — DEMO & MEETING ASSETS ══ -->
+<div class="slide" id="slide-16">
+  <div class="slide-bg bg-ice"></div>
+  <div class="slide-content">
+    <h3 class="lbl purple">YOUR TOOLKIT &middot; PRE-BUILT ASSETS</h3>
+    <h2>Demo &amp; <span class="hip">Meeting Assets</span> for every CFO engagement</h2>
+    <div class="divp"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">CFO First Meeting Deck</div>
+        <p style="font-size:0.78rem;margin:0 0 0.3rem;max-width:100%;">20-slide PechaKucha, auto-generated per customer. Discovers assets (videos, teasers), extracts facts, builds narrated deck with dual-voice AI.</p>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;"><span class="pill" style="font-size:0.58rem;">cfo-first-meeting-deck</span></div>
+        <p style="font-size:0.68rem;color:var(--text-light);margin:0.3rem 0 0;max-width:100%;">Available: BP, Kesko, ILG, DWS, Booking, Siemens DISW, MUFG, BA, JPMC, JLR</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">Industry Demo Teasers</div>
+        <p style="font-size:0.78rem;margin:0 0 0.3rem;max-width:100%;">Narrated screen-capture videos with CFO-specific talk tracks. Strategic narrator + play-by-play narrator. Dead time removed, professional voiceover.</p>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;"><span class="pill" style="font-size:0.58rem;">snowplan-teaser-generator</span></div>
+        <p style="font-size:0.68rem;color:var(--text-light);margin:0.3rem 0 0;max-width:100%;">Available: BP, Kesko, ILG, DWS, DB, Siemens, JLR, JPMC, BA, Booking, MUFG</p>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">CFO Discovery Brief</div>
+        <p style="font-size:0.78rem;margin:0 0 0.3rem;max-width:100%;">Account-specific preparation document. Maps CFO's likely questions to demo assets. 8 discovery clusters with SE guidance. Includes readiness checklist.</p>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;"><span class="pill" style="font-size:0.58rem;">Template: Orlen model</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1.5px solid rgba(36,158,220,0.3);border-radius:12px;padding:0.9rem 1rem;">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--sf-mid);margin-bottom:0.3rem;">SnowPlan FPA Starter Kit</div>
+        <p style="font-size:0.78rem;margin:0 0 0.3rem;max-width:100%;">Full Finance Decision Fabric app, auto-generated per customer. Next.js + SPCS deployment. Cortex AI integration. Customer-branded.</p>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;"><span class="pill" style="font-size:0.58rem;">fpa-starter-kit</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="24" style="opacity:0.85;"></div>
+  <div class="slide-number">16 / 18</div>
+</div>
+
+<!-- ══ SLIDE 17 — 30-MINUTE MEETING STRUCTURE ══ -->
+<div class="slide" id="slide-17">
+  <div class="slide-bg bg-white"></div>
+  <div class="slide-content">
+    <h3 class="lbl">EXECUTION &middot; MEETING STRUCTURE</h3>
+    <h2>The 30-Minute <span class="hi">CFO Meeting</span></h2>
+    <div class="div"></div>
+    <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:1.2rem;">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.6rem 1rem;border-radius:8px;background:rgba(36,158,220,0.1);border:1.5px solid rgba(36,158,220,0.3);">
+            <div style="color:var(--sf-blue);font-weight:700;font-size:0.8rem;min-width:60px;">0-5 min</div>
+            <div style="color:var(--text-gray);font-size:0.82rem;">Context setting. Why this account, why now. Account-specific numbers.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.6rem 1rem;border-radius:8px;background:rgba(36,158,220,0.07);border:1.5px solid rgba(36,158,220,0.22);">
+            <div style="color:var(--sf-blue);font-weight:700;font-size:0.8rem;min-width:60px;">5-15 min</div>
+            <div style="color:var(--text-gray);font-size:0.82rem;">Demo walkthrough. ONE compelling use case per topic. Customer-labelled data.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.6rem 1rem;border-radius:8px;background:rgba(36,158,220,0.04);border:1.5px solid rgba(36,158,220,0.15);">
+            <div style="color:var(--sf-blue);font-weight:700;font-size:0.8rem;min-width:60px;">15-22 min</div>
+            <div style="color:var(--text-gray);font-size:0.82rem;">CFO challenge questions. Anticipate &amp; respond live. Have crisp answers ready.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.6rem 1rem;border-radius:8px;background:rgba(17,86,127,0.04);border:1.5px solid rgba(17,86,127,0.15);">
+            <div style="color:var(--sf-mid);font-weight:700;font-size:0.8rem;min-width:60px;">22-30 min</div>
+            <div style="color:var(--text-gray);font-size:0.82rem;">Gap analysis + next steps. What's missing? Who owns what? Timeline to pilot.</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.65rem;">
+        <div style="background:rgba(17,86,127,0.05);border:1.5px solid rgba(17,86,127,0.2);border-radius:12px;padding:0.8rem 1rem;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--sf-mid);margin-bottom:0.4rem;">Pre-Meeting Checklist</div>
+          <div style="display:flex;flex-direction:column;gap:0.25rem;font-size:0.78rem;color:var(--text-gray);">
+            <div style="display:flex;gap:0.4rem;">&#10003; Demo staged with customer's entity structure &amp; segment names</div>
+            <div style="display:flex;gap:0.4rem;">&#10003; RBAC demo: 3 login roles configured</div>
+            <div style="display:flex;gap:0.4rem;">&#10003; Microsoft/platform co-existence slide prepared</div>
+            <div style="display:flex;gap:0.4rem;">&#10003; TCO ballpark range agreed internally</div>
+            <div style="display:flex;gap:0.4rem;">&#10003; Reference customer briefed and available</div>
+            <div style="display:flex;gap:0.4rem;">&#10003; All demos tested morning-of</div>
+          </div>
+        </div>
+        <div style="background:rgba(36,158,220,0.06);border-left:3px solid var(--sf-blue);border-radius:0 8px 8px 0;padding:0.6rem 0.8rem;">
+          <p style="font-size:0.82rem;color:var(--sf-mid);margin:0;max-width:100%;font-style:italic;">"Don't show every capability. Show ONE compelling use case and let the CFO ask for more."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22" style="opacity:0.85;"></div>
+  <div class="slide-number">17 / 18</div>
+</div>
+
+<!-- ══ SLIDE 18 — WORKING TOGETHER / CTA ══ -->
+<div class="slide dark-slide" id="slide-18">
+  <div class="slide-bg" style="background:var(--sf-deep);"></div>
+  <div style="position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 80% 30%,rgba(113,211,220,0.1) 0%,rgba(4,33,48,0) 60%);"></div>
+  <div class="slide-content">
+    <h3 class="lbl" style="color:rgba(255,255,255,0.5);">WORKING TOGETHER &middot; CFO GTM FUNCTION</h3>
+    <h2 style="color:#FFFFFF;">What the CFO GTM function <span style="color:var(--sf-star);">does for you</span></h2>
+    <div style="width:60px;height:3px;background:rgba(255,255,255,0.2);margin:0.7rem 0 1rem;border-radius:2px;"></div>
+    <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:1.1rem;">
+      <div style="display:flex;flex-direction:column;gap:0.55rem;">
+        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.4);margin-bottom:0.1rem;">What I can do for your team</div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.7rem 0.9rem;">
+          <div style="font-size:0.82rem;font-weight:700;color:#FFFFFF;margin-bottom:0.18rem;">Account strategy &amp; narrative</div>
+          <p style="font-size:0.78rem;color:rgba(255,255,255,0.58);margin:0;max-width:100%;">Industry-specific framing, proof points, discovery question prep &mdash; before any CFO-first conversation. Tell me the account; I'll give you the story.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.7rem 0.9rem;">
+          <div style="font-size:0.82rem;font-weight:700;color:#FFFFFF;margin-bottom:0.18rem;">Content, collateral &amp; demo</div>
+          <p style="font-size:0.78rem;color:rgba(255,255,255,0.58);margin:0;max-width:100%;">First-meeting decks, SnowPlan apps, demo teasers, discovery briefs &mdash; all auto-generated per customer with CoCo skills.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.7rem 0.9rem;">
+          <div style="font-size:0.82rem;font-weight:700;color:#FFFFFF;margin-bottom:0.18rem;">SAP partnership &amp; co-sell</div>
+          <p style="font-size:0.78rem;color:rgba(255,255,255,0.58);margin:0;max-width:100%;">Joint customers: CokeOne, JetBlue, Petco, Juniper, Siemens, Pfizer, Devon, ABB. SAP co-existence narrative for every CFO meeting.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.4);margin-bottom:0.1rem;">How to engage &mdash; bring me</div>
+        <div style="background:rgba(113,211,220,0.07);border:1.5px solid rgba(113,211,220,0.2);border-radius:10px;padding:0.85rem 1rem;">
+          <div style="font-size:0.8rem;font-weight:800;color:var(--sf-star);margin-bottom:0.5rem;">The minimum I need to be useful:</div>
+          <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <div style="display:flex;gap:0.5rem;"><span style="color:var(--sf-star);font-weight:700;flex-shrink:0;">1.</span><span style="font-size:0.8rem;color:rgba(255,255,255,0.7);">Their tech stack &mdash; what ERP, what EPM</span></div>
+            <div style="display:flex;gap:0.5rem;"><span style="color:var(--sf-star);font-weight:700;flex-shrink:0;">2.</span><span style="font-size:0.8rem;color:rgba(255,255,255,0.7);">The pain you've heard &mdash; even one sentence</span></div>
+            <div style="display:flex;gap:0.5rem;"><span style="color:var(--sf-star);font-weight:700;flex-shrink:0;">3.</span><span style="font-size:0.8rem;color:rgba(255,255,255,0.7);">What you want out of the next meeting</span></div>
+          </div>
+        </div>
+        <div style="background:rgba(36,158,220,0.08);border:1.5px solid rgba(36,158,220,0.2);border-radius:10px;padding:0.75rem 0.9rem;text-align:center;">
+          <div style="font-size:0.95rem;font-weight:800;color:var(--sf-star);margin-bottom:0.15rem;">Mark Deprez</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);">mark.deprez@snowflake.com</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.38);margin-top:0.15rem;">Director GTM Strategy &mdash; CFO Office Transformation &middot; EMEA</div>
+        </div>
+        <div style="background:rgba(113,211,220,0.08);border:1.5px solid rgba(113,211,220,0.2);border-radius:10px;padding:0.5rem 0.8rem;">
+          <p style="font-size:0.82rem;color:var(--sf-star);margin:0;max-width:100%;font-style:italic;text-align:center;">"Leave the CFO with ONE thing: Snowflake is what makes their investment programme visible, plannable, and auditable."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sf-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Snowflake_Logo.svg" height="22"></div>
+  <div class="slide-number">18 / 18</div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="controls">
+  <button class="ctrl-btn" id="btnPrev">&larr; Prev</button>
+  <select class="slide-sel" id="slideSelect">
+    <option value="1">01 &mdash; CFO Field Enablement</option>
+    <option value="2">02 &mdash; Why Now</option>
+    <option value="3">03 &mdash; The Problem</option>
+    <option value="4">04 &mdash; CFO Personas</option>
+    <option value="5">05 &mdash; Cortex AI Architecture</option>
+    <option value="6">06 &mdash; Finance Workflows</option>
+    <option value="7">07 &mdash; Snow-on-Snow: Snowhouse</option>
+    <option value="8">08 &mdash; 6 Finance AI Agents</option>
+    <option value="9">09 &mdash; Customer Proof Points</option>
+    <option value="10">10 &mdash; Persona Language Guide</option>
+    <option value="11">11 &mdash; Discovery Questions</option>
+    <option value="12">12 &mdash; Objection Handling</option>
+    <option value="13">13 &mdash; Finance-Grade Governance</option>
+    <option value="14">14 &mdash; EPM Displacement</option>
+    <option value="15">15 &mdash; Consumption Map</option>
+    <option value="16">16 &mdash; Demo &amp; Meeting Assets</option>
+    <option value="17">17 &mdash; 30-Min Meeting Structure</option>
+    <option value="18">18 &mdash; Working Together</option>
+  </select>
+  <button class="ctrl-btn" id="btnNext">Next &rarr;</button>
+</div>
+
+<script>
+const SLIDES=[];
+for(let i=1;i<=18;i++) SLIDES.push('slide-'+i);
+const TOTAL=SLIDES.length;
+let current=0;
+
+function goTo(i){
+  if(i<0)i=0;if(i>=TOTAL)i=TOTAL-1;
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById(SLIDES[i]).classList.add('active');
+  document.getElementById('progressBar').style.width=((i+1)/TOTAL*100)+'%';
+  document.getElementById('slideSelect').value=i+1;
+  current=i;
+}
+function nextSlide(){if(current<TOTAL-1)goTo(current+1);}
+function prevSlide(){if(current>0)goTo(current-1);}
+
+document.getElementById('btnPrev').addEventListener('click',prevSlide);
+document.getElementById('btnNext').addEventListener('click',nextSlide);
+document.getElementById('slideSelect').addEventListener('change',function(){goTo(parseInt(this.value)-1);});
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nextSlide();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prevSlide();}
+});
+
+// Scale deck to fit window
+function scaleViewport(){
+  var deck=document.querySelector('.deck');
+  var s=Math.min(window.innerWidth/1280,window.innerHeight/720);
+  deck.style.transform='scale('+s+')';
+}
+window.addEventListener('resize',scaleViewport);
+scaleViewport();
+goTo(0);
+</script>
+</body>
+</html>
+</content>
+</invoke>
