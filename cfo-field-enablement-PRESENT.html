@@ -933,14 +933,18 @@ const SLIDES=[];
 for(let i=1;i<=19;i++) SLIDES.push('slide-'+i);
 const TOTAL=SLIDES.length;
 let current=0;
-let autoPlay=false;
-let narrating=false;
-let autoTimer=null;
-let currentAudio=null;
-let playbackRate=1.0;
-const speeds=[1.0,1.5,2.0];
-let speedIdx=0;
-const audioData={};
+
+// Dual-voice narration engine
+var ELEVEN_API_KEY='REDACTED';
+var VOICE_A='onwK4e9ZLuTAKqWW03F9'; // Daniel (lead)
+var VOICE_B='EXAVITQu4vr4xnSDxMaL'; // Bella (interviewer)
+var MODEL='eleven_multilingual_v2';
+
+var narrating=false,autoPlay=false,autoTimer=null,currentAudio=null;
+var narrationGeneration=0,narrationTimer=null;
+var playbackRate=1.0,speeds=[1.0,1.5,2.0],speedIdx=0,audioUnlocked=false;
+
+var narratorScripts={"1": [{"v": 0, "t": "Welcome to the Office of the CFO field enablement deck. This is your discovery, positioning, and demo guidance for selling into the modern finance office."}, {"v": 1, "t": "What's the core positioning?"}, {"v": 0, "t": "Snowflake is the agentic control plane for the modern finance office. Ask any financial question, build any finance tool, govern every answer."}], "2": [{"v": 0, "t": "Let's start with why now. The CFO's world has fundamentally changed. Eighty percent of CFOs now own the enterprise data and AI strategy."}, {"v": 1, "t": "What's driving that shift?"}, {"v": 0, "t": "Three forces. First, the E U AI Act goes live August 2026, making governance non-negotiable. Second, interest rates mean every basis point of working capital matters. And third, boards now expect real-time scenario planning, not quarterly spreadsheets."}], "3": [{"v": 0, "t": "The problem is clear. Legacy platforms create data challenges across every finance function."}, {"v": 1, "t": "How bad is it really?"}, {"v": 0, "t": "Finance teams spend 60 to 80 percent of their time wrangling data instead of analyzing it. Siloed storage, multiple processing engines, fragmented governance. FP and A, Accounting, and Tax have no unified view. The result? Eroded margins, obscured liquidity, slow innovation, and governance risk."}], "4": [{"v": 0, "t": "Here's the answer. Snowflake for finance, built on three pillars: Easy, Connected, and Trusted."}, {"v": 1, "t": "Walk us through each one."}, {"v": 0, "t": "Easy means embedding trusted AI into finance workflows. Personal finance agents, natural language queries, no ML team required. Connected means full financial visibility, unifying ERP, GL, sub-ledger, and operational data into one governed platform. And Trusted means defensible to the board and the auditor. SOC 1 and 2, PCI DSS, HIPAA, FedRAMP. Every answer auditable, every model explainable."}], "5": [{"v": 0, "t": "There are six key buyer personas in the Office of the CFO."}, {"v": 1, "t": "Who should we start with?"}, {"v": 0, "t": "At the executive layer, you have FP and A who owns the forecast, Treasury who manages cash and FX, and Accounting who drives the close cycle. At the operations layer, Tax and Compliance, Corporate Strategy for M and A, and Internal Audit for continuous controls. The key insight is always map capabilities to specific personas, not generic finance teams."}], "6": [{"v": 0, "t": "The platform is Cortex AI. A single governed stack from ingestion through to AI agents."}, {"v": 1, "t": "What makes this different from other AI platforms?"}, {"v": 0, "t": "Data never moves. You get the full AI layer, Cortex functions, ML models, LLM inference, agents, all running on the same governed data. No shadow copies, no data movement, no separate ML infrastructure. That's the architecture CFOs trust."}], "7": [{"v": 0, "t": "We've mapped eight finance workflow domains where Snowflake delivers immediate business outcomes."}, {"v": 1, "t": "What are the highest-value ones?"}, {"v": 0, "t": "FP and A with daily re-forecasting and scenario planning. Accounting with automated GL flux analysis and reconciliation. Internal Audit moving from sampling to continuous monitoring. Treasury with real-time cash and FX alerts. Tax planning, Investor Relations for earnings prep, FinOps for cloud spend governance, and Procurement analytics. Each one maps to a Cortex AI capability."}], "8": [{"v": 0, "t": "We drink our own champagne. Snowhouse is our internal finance platform, running six AI agents in production today."}, {"v": 1, "t": "What does Brian Robins say about it?"}, {"v": 0, "t": "Brian, our CFO, says: Finance is the enterprise data backbone. We don't just report numbers, we partner with the business in decision making. COGS margin optimization alone justified the entire platform. They've gone from 50 spreadsheets to one, board reporting from two weeks to 48 hours, and daily re-forecasting of revenue, bookings, billings, and COGS. Plus the Good Morning CFO daily briefing agent on Snowflake Intelligence."}], "9": [{"v": 0, "t": "Let's look at the six agents running in production today at Snowflake Finance."}, {"v": 1, "t": "Which one gets the most traction in customer conversations?"}, {"v": 0, "t": "RevOps AI agent for order to cash is the crowd favorite. It answers sales questions about policies, attainment, and accounts via Slack. But the Abacus accounting agent and the continuous controls agent for SOX testing are the ones that make CFOs lean forward. They see themselves in those workflows immediately."}], "10": [{"v": 0, "t": "Customer proof points. These are real outcomes from real CFO deployments."}, {"v": 1, "t": "Which ones are publicly referenceable?"}, {"v": 0, "t": "WHOOP is fully public. Three times faster forecasting with Snowpark ML. Fortum achieved 85 percent cost reduction, running 70,000 queries per day across 1,500 users. AstraZeneca has 118 data products and over 10 million in savings with SAP plus Snowflake. M and T Bank saved over 12 million annually modernizing finance and liquidity analytics. And in the reference bar: Ericsson with 4x cost savings and 7 million recaptured, Unifi Aviation saving over 28 million, and PMI with 76 percent analyst productivity gains."}], "11": [{"v": 0, "t": "Persona language guide. Every persona has one thing they measure and one thing they fear."}, {"v": 1, "t": "Give us an example."}, {"v": 0, "t": "FP and A leaders measure forecast accuracy and variance analysis cycle time. Their fear is overnight pipeline runs and stale numbers in the board pack. Your message: What if your forecast updated daily instead of monthly, and every number was traceable to source? Treasurers fear counterparty blind spots. Accountants fear the 15-day close. Speak their language, not ours."}], "12": [{"v": 0, "t": "Discovery questions. Eight clusters designed to open the conversation and qualify the opportunity."}, {"v": 1, "t": "What's the most effective opener?"}, {"v": 0, "t": "Start with: How many days does your month-end close take? Then follow with: What percentage of your finance team's time is spent gathering data versus analyzing it? These two questions expose the pain immediately. The full eight clusters cover data landscape, planning maturity, compliance pressure, AI readiness, and more."}], "13": [{"v": 0, "t": "Objection handling. Every seller hits the same five objections."}, {"v": 1, "t": "What's the toughest one?"}, {"v": 0, "t": "We already have an EPM tool. The reframe is: EPM gives you a planning interface. Snowflake gives you the governed data and AI layer underneath. When your CFO asks why the forecast was wrong, EPM shows the model. Snowflake shows the data lineage, the model, and the audit trail. They're complementary, but only one is defensible to the board."}], "14": [{"v": 0, "t": "Governance is the number one CFO differentiator. This is what wins the deal."}, {"v": 1, "t": "Why does governance matter more than features?"}, {"v": 0, "t": "Because CFOs are accountable to the board and the auditor. No data movement means no shadow spreadsheets. Multi-layer RBAC ensures the Lithuanian CFO sees Lithuania, the Group CFO sees everything. Full audit trail, SOX-ready, GDPR-compliant. Plus AI cost and token governance so CFOs control the AI budget per agent and per workflow. Verified queries mean every AI answer shows its source."}], "15": [{"v": 0, "t": "The displacement play. Anaplan, Adaptive, Pigment, these are the EPM tools we replace."}, {"v": 1, "t": "How do we position against them?"}, {"v": 0, "t": "SnowPlan replaces seat-based EPM with consumption-based FP and A on Snowflake. Parameterized macro scenarios in real time. Change one input, cascade through EBITDA by segment to net debt. The key message: stop paying per seat for a planning silo. Build planning on the same platform your data already lives on."}], "16": [{"v": 0, "t": "Consumption map. This is how CFO workloads drive Snowflake consumption and retire quota."}, {"v": 1, "t": "Where's the biggest revenue driver?"}, {"v": 0, "t": "Cortex Agents is the highest-value driver. Always-on agents for T and E, RevOps, controls monitoring. Each agent run equals LLM tokens plus compute. Then data ingestion and storage with Snowpipe and Dynamic Tables. Cortex ML for forecasting. Cortex Analyst for self-service. Marketplace for external data subscriptions. And SnowPlan as net-new EPM replacement workload."}], "17": [{"v": 0, "t": "Your toolkit. Pre-built assets ready for customer meetings."}, {"v": 1, "t": "What should I bring to a first meeting?"}, {"v": 0, "t": "Start with the Good Morning CFO demo on Snowflake Intelligence. It's the killer demo. Then the GL flux analysis walkthrough. For deeper sessions, the SnowPlan scenario planning demo and the continuous controls monitoring demo. All available in the demo catalog. Plus the 6 finance agent architecture slide if they want technical depth."}], "18": [{"v": 0, "t": "Thirty-minute meeting structure. This is your playbook for the first CFO conversation."}, {"v": 1, "t": "How should I open?"}, {"v": 0, "t": "Five minutes on why now with market forces. Then ten minutes of discovery using the question clusters. Then ten minutes of Snow-on-Snow proof, showing what our own finance team does. Close with five minutes on next steps. Key rule: listen more than you pitch. The discovery questions do the selling for you."}], "19": [{"v": 0, "t": "Working together. The CFO GTM function is here to help you succeed."}, {"v": 1, "t": "How do we engage?"}, {"v": 0, "t": "Three things to bring: their tech stack, what ERP and EPM they use. The pain you've heard, even one sentence. And what you want out of the next meeting. Reach out to Mark Deprez, Director GTM Strategy for CFO Office Transformation in EMEA. Leave every CFO with one thing: Snowflake is what makes their investment programme visible, plannable, and auditable."}]};
 
 function goTo(i){
   if(i<0)i=0;if(i>=TOTAL)i=TOTAL-1;
@@ -949,7 +953,7 @@ function goTo(i){
   document.getElementById('progressBar').style.width=((i+1)/TOTAL*100)+'%';
   document.getElementById('slideSelect').value=i+1;
   current=i;
-  if(narrating) playAudio(i+1);
+  if(narrating) narrateSlide(current);
   if(autoPlay&&!narrating) startTimerBar();
 }
 function nextSlide(){if(current<TOTAL-1)goTo(current+1);}
@@ -986,40 +990,117 @@ function stopAuto(){
   resetTimerBar();
 }
 
-// Narration
+// Audio unlock (Safari/Chrome autoplay policy)
+function unlockAudio(){
+  if(audioUnlocked)return Promise.resolve();
+  var ctx=new(window.AudioContext||window.webkitAudioContext)();
+  var buf=ctx.createBuffer(1,1,22050);
+  var src=ctx.createBufferSource();
+  src.buffer=buf;src.connect(ctx.destination);src.start(0);
+  audioUnlocked=true;
+  var silent=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIa+AAACABAAZGF0YQAAAAA=');
+  return silent.play().then(function(){silent.pause();}).catch(function(){});
+}
+
+// ElevenLabs TTS fetch
+function fetchAudio(text,vid){
+  return fetch('https://api.elevenlabs.io/v1/text-to-speech/'+vid,{
+    method:'POST',
+    headers:{'xi-api-key':ELEVEN_API_KEY,'Content-Type':'application/json','Accept':'audio/mpeg'},
+    body:JSON.stringify({text:text,model_id:MODEL,voice_settings:{stability:0.5,similarity_boost:0.75,style:0.3}})
+  })
+  .then(function(r){if(!r.ok)throw new Error(r.status);return r.blob();})
+  .then(function(b){return URL.createObjectURL(b);});
+}
+
+// Core dual-voice playback engine
+function playQueue(chunks,onDone){
+  narrationGeneration++;
+  var gen=narrationGeneration;
+  var idx=0;
+  function go(){
+    if(gen!==narrationGeneration||!narrating)return;
+    if(idx>=chunks.length){if(onDone&&gen===narrationGeneration)onDone();return;}
+    var c=chunks[idx];
+    var vid=c.v===0?VOICE_A:VOICE_B;
+    var btn=document.getElementById('narrateBtn');
+    btn.innerHTML='&#9203; '+((idx+1)+'/'+chunks.length);
+    fetchAudio(c.t,vid).then(function(url){
+      if(gen!==narrationGeneration||!narrating){if(url&&url.startsWith('blob:'))URL.revokeObjectURL(url);return;}
+      var a=new Audio(url);
+      a.playbackRate=playbackRate;
+      currentAudio=a;
+      btn.innerHTML='&#9208; '+((idx+1)+'/'+chunks.length);
+      // Timer bar synced to audio duration
+      a.addEventListener('loadedmetadata',function(){
+        var bar=document.getElementById('timerBar');
+        var dur=a.duration/playbackRate;
+        bar.style.transition='none';bar.style.width='100%';
+        void bar.offsetWidth;
+        bar.style.transition='width '+dur+'s linear';bar.style.width='0%';
+      });
+      a.onended=function(){
+        if(url&&url.startsWith('blob:'))URL.revokeObjectURL(url);
+        if(currentAudio===a)currentAudio=null;
+        if(gen!==narrationGeneration)return;
+        idx++;
+        narrationTimer=setTimeout(go,250);
+      };
+      a.onerror=function(){
+        if(url&&url.startsWith('blob:'))URL.revokeObjectURL(url);
+        idx++;
+        var fallback=Math.max(2500,c.t.length*55);
+        narrationTimer=setTimeout(go,fallback);
+      };
+      a.play().catch(function(){btn.innerHTML='&#9888; Click, then N';narrating=false;});
+    }).catch(function(){
+      idx++;
+      var fallback=Math.max(2500,chunks[idx-1].t.length*55);
+      narrationTimer=setTimeout(go,fallback);
+    });
+  }
+  go();
+}
+
+// Per-slide narration trigger
+function narrateSlide(i){
+  stopAudio();
+  var c=narratorScripts[String(i+1)];
+  if(!c||!c.length)return;
+  playQueue(c,function(){
+    if(narrating&&current<TOTAL-1){
+      narrationTimer=setTimeout(function(){nextSlide();},800);
+    } else if(current>=TOTAL-1){stopNarrate();stopAuto();}
+  });
+}
+
+// Stop narration audio
+function stopAudio(){
+  narrationGeneration++;
+  if(narrationTimer){clearTimeout(narrationTimer);narrationTimer=null;}
+  if(currentAudio){currentAudio.pause();currentAudio.src='';currentAudio=null;}
+}
+
+// Toggle narration
 function toggleNarrate(){narrating?stopNarrate():startNarrate();}
 function startNarrate(){
-  narrating=true;autoPlay=true;
-  document.getElementById('narrateBtn').classList.add('active');
-  document.getElementById('narrateBtn').innerHTML='&#9208; Narrating';
-  document.getElementById('autoBtn').classList.add('active');
-  document.getElementById('autoBtn').innerHTML='Auto &#9208;';
-  clearInterval(autoTimer);playAudio(current+1);
+  narrating=true;
+  var btn=document.getElementById('narrateBtn');
+  btn.innerHTML='&#9203; Unlocking...';
+  unlockAudio().then(function(){
+    if(!narrating)return;
+    btn.classList.add('active');
+    btn.innerHTML='&#9208; Narrating';
+    if(autoPlay)stopAuto();
+    narrateSlide(current);
+  });
 }
 function stopNarrate(){
   narrating=false;
-  if(currentAudio){currentAudio.pause();currentAudio=null;}
-  document.getElementById('narrateBtn').classList.remove('active');
-  document.getElementById('narrateBtn').innerHTML='&#9654; Narrate';
-}
-function playAudio(slideNum){
-  if(currentAudio){currentAudio.pause();}
-  var b64=audioData[String(slideNum)];
-  if(!b64){if(current<TOTAL-1)setTimeout(function(){nextSlide();},3000);return;}
-  currentAudio=new Audio('data:audio/mp3;base64,'+b64);
-  currentAudio.playbackRate=playbackRate;
-  currentAudio.addEventListener('loadedmetadata',function(){
-    var bar=document.getElementById('timerBar');
-    var dur=currentAudio.duration/playbackRate;
-    bar.style.transition='none';bar.style.width='100%';
-    void bar.offsetWidth;
-    bar.style.transition='width '+dur+'s linear';bar.style.width='0%';
-  });
-  currentAudio.addEventListener('ended',function(){
-    if(narrating&&current<TOTAL-1){setTimeout(function(){nextSlide();},1200);}
-    else if(current>=TOTAL-1){stopNarrate();stopAuto();}
-  });
-  currentAudio.play().catch(function(e){console.warn('Audio play blocked:',e);stopNarrate();});
+  stopAudio();
+  var btn=document.getElementById('narrateBtn');
+  btn.classList.remove('active');
+  btn.innerHTML='&#9654; Narrate';
 }
 
 // Speed control
@@ -1044,6 +1125,7 @@ document.getElementById('fullBtn').addEventListener('click',toggleFullscreen);
 
 // Keyboard shortcuts
 document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='SELECT')return;
   if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nextSlide();}
   if(e.key==='ArrowLeft'){e.preventDefault();prevSlide();}
   if(e.key==='a'||e.key==='A')toggleAuto();
@@ -1051,7 +1133,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='f'||e.key==='F')toggleFullscreen();
 });
 
-// External message listener (for embedding)
+// External message listener
 window.addEventListener('message',function(e){
   if(e.data&&e.data.action==='startNarration'){toggleNarrate();}
 });
