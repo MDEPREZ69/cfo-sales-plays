@@ -1317,7 +1317,6 @@ function goTo(i){
   document.getElementById('slideSelect').value=i+1;
   current=i;
   if(narrating) narrateSlide(current);
-  if(autoPlay&&!narrating) startTimerBar();
 }
 function getSubsteps(slideIdx){
   var el=document.getElementById(SLIDES[slideIdx]);
@@ -1372,19 +1371,19 @@ function startAuto(){
   document.getElementById('autoBtn').classList.add('active');
   document.getElementById('autoBtn').innerHTML='Auto &#9208;';
   clearTimeout(autoTimer);
-  autoTimer=setTimeout(autoStep,1000);
+  autoTimer=setTimeout(autoStep,1500);
 }
 function autoStep(){
-  if(!autoPlay){console.log('autoStep: stopped');return;}
-  var subsBefore=getSubsteps(current);var rcBefore=revealedCount(current);
-  console.log('autoStep: slide='+current+' subs='+subsBefore.length+' revealed='+rcBefore);
+  if(!autoPlay)return;
+  var slideBefore=current;
   nextSlide();
-  var subsAfter=getSubsteps(current);var rcAfter=revealedCount(current);
-  console.log('autoStep after nextSlide: slide='+current+' subs='+subsAfter.length+' revealed='+rcAfter);
-  if(current>=TOTAL-1&&(subsAfter.length===0||rcAfter>=subsAfter.length)){stopAuto();return;}
-  var delay=(subsAfter.length>0&&rcAfter<subsAfter.length)?2000:4000;
-  console.log('autoStep: next in '+delay+'ms');
-  autoTimer=setTimeout(autoStep,delay);
+  var stayedOnSlide=(current===slideBefore);
+  if(current>=TOTAL-1){
+    var subs=getSubsteps(current);
+    var rc=revealedCount(current);
+    if(subs.length===0||rc>=subs.length){stopAuto();return;}
+  }
+  autoTimer=setTimeout(autoStep, stayedOnSlide ? 2500 : 5000);
 }
 function stopAuto(){
   autoPlay=false;clearTimeout(autoTimer);
