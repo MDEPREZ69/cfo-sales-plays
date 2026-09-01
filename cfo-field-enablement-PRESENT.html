@@ -1371,19 +1371,16 @@ function startAuto(){
   autoPlay=true;
   document.getElementById('autoBtn').classList.add('active');
   document.getElementById('autoBtn').innerHTML='Auto &#9208;';
-  if(!narrating){autoStep();}
+  clearTimeout(autoTimer);
+  autoTimer=setTimeout(autoStep,1000);
 }
 function autoStep(){
   if(!autoPlay)return;
+  nextSlide();
   var subs=getSubsteps(current);
   var rc=revealedCount(current);
-  if(subs.length>0&&rc<subs.length){
-    nextSlide();
-    autoTimer=setTimeout(autoStep,2000);
-  } else {
-    if(current<TOTAL-1){nextSlide();autoTimer=setTimeout(autoStep,4000);}
-    else stopAuto();
-  }
+  var delay=(subs.length>0&&rc<subs.length)?2000:4000;
+  autoTimer=setTimeout(autoStep,delay);
 }
 function stopAuto(){
   autoPlay=false;clearTimeout(autoTimer);
