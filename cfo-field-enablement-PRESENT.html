@@ -1375,15 +1375,17 @@ function startAuto(){
 }
 function autoStep(){
   if(!autoPlay)return;
-  var slideBefore=current;
-  nextSlide();
-  var stayedOnSlide=(current===slideBefore);
-  if(current>=TOTAL-1){
-    var subs=getSubsteps(current);
-    var rc=revealedCount(current);
-    if(subs.length===0||rc>=subs.length){stopAuto();return;}
+  var subs=getSubsteps(current);
+  var rc=revealedCount(current);
+  if(subs.length>0 && rc<subs.length){
+    subs[rc].classList.add('revealed');
+    autoTimer=setTimeout(autoStep,2500);
+  } else if(current<TOTAL-1){
+    goTo(current+1);
+    autoTimer=setTimeout(autoStep,5000);
+  } else {
+    stopAuto();
   }
-  autoTimer=setTimeout(autoStep, stayedOnSlide ? 2500 : 5000);
 }
 function stopAuto(){
   autoPlay=false;clearTimeout(autoTimer);
