@@ -1305,6 +1305,8 @@ var TOTAL=SLIDES.length;
 var current=0;
 var narrating=false,autoPlay=false,autoTimer=null,currentAudio=null;
 var narrationGeneration=0,narrationTimer=null;
+var narrationDoneForSlide=true;
+var slideEnteredAt=0;
 var playbackRate=1.0,speeds=[1.0,1.5,2.0],speedIdx=0;
 
 function goTo(i){
@@ -1316,8 +1318,9 @@ function goTo(i){
   document.getElementById('progressBar').style.width=((i+1)/TOTAL*100)+'%';
   document.getElementById('slideSelect').value=i+1;
   current=i;
+  slideEnteredAt=Date.now();
   if(narrating) narrateSlide(current);
-  if(autoPlay){clearTimeout(autoTimer);var newSubs=getSubsteps(i);autoTimer=setTimeout(autoStep,newSubs.length>0?1500:5000);}
+  if(autoPlay){clearTimeout(autoTimer);autoTimer=setTimeout(autoStep,1500);}
 }
 function getSubsteps(slideIdx){
   var el=document.getElementById(SLIDES[slideIdx]);
@@ -1382,10 +1385,15 @@ function autoStep(){
   if(subs.length>0 && rc<subs.length){
     subs[rc].classList.add('revealed');
     autoTimer=setTimeout(autoStep,2500);
-  } else if(current<TOTAL-1){
-    goTo(current+1);
+  } else if(narrating && !narrationDoneForSlide){
+    // All substeps revealed but narration still playing — wait
+    autoTimer=setTimeout(autoStep,1000);
   } else {
-    stopAuto();
+    // Enforce minimum 5s dwell on every slide before advancing
+    var dwelt=Date.now()-slideEnteredAt;
+    if(dwelt<5000){autoTimer=setTimeout(autoStep,5000-dwelt);return;}
+    if(current<TOTAL-1){goTo(current+1);}
+    else{stopAuto();}
   }
 }
 function stopAuto(){
@@ -1443,12 +1451,14 @@ function playQueue(chunks,onDone){
 function narrateSlide(i){
   stopAudio();
   var ch=narratorScripts[String(i+1)];
-  if(!ch||!ch.length)return;
+  if(!ch||!ch.length){narrationDoneForSlide=true;return;}
+  narrationDoneForSlide=false;
   playQueue(ch,function(){
+    narrationDoneForSlide=true;
     if(narrating&&current<TOTAL-1){
       if(autoPlay){
-        // Auto is running — let auto handle ALL slide advancement and substep reveals.
-        // Narration just plays audio, never advances. Auto's goTo will trigger narrateSlide for the next slide.
+        // Narration done — kick auto to check immediately instead of waiting up to 1s
+        clearTimeout(autoTimer);autoTimer=setTimeout(autoStep,800);
         return;
       }
       // Narration-only mode (no auto): advance after a pause
