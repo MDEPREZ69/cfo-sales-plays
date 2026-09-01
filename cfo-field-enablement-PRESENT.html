@@ -1375,11 +1375,15 @@ function startAuto(){
   autoTimer=setTimeout(autoStep,1000);
 }
 function autoStep(){
-  if(!autoPlay)return;
+  if(!autoPlay){console.log('autoStep: stopped');return;}
+  var subsBefore=getSubsteps(current);var rcBefore=revealedCount(current);
+  console.log('autoStep: slide='+current+' subs='+subsBefore.length+' revealed='+rcBefore);
   nextSlide();
-  var subs=getSubsteps(current);
-  var rc=revealedCount(current);
-  var delay=(subs.length>0&&rc<subs.length)?2000:4000;
+  var subsAfter=getSubsteps(current);var rcAfter=revealedCount(current);
+  console.log('autoStep after nextSlide: slide='+current+' subs='+subsAfter.length+' revealed='+rcAfter);
+  if(current>=TOTAL-1&&(subsAfter.length===0||rcAfter>=subsAfter.length)){stopAuto();return;}
+  var delay=(subsAfter.length>0&&rcAfter<subsAfter.length)?2000:4000;
+  console.log('autoStep: next in '+delay+'ms');
   autoTimer=setTimeout(autoStep,delay);
 }
 function stopAuto(){
