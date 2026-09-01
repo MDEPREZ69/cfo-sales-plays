@@ -68,6 +68,8 @@ select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-r
 .doc-preview-icon:hover{background:rgba(255,255,255,0.25);}
 [data-substep]{opacity:0;transform:translateY(8px);transition:opacity 0.5s ease,transform 0.5s ease;}
 [data-substep].revealed{opacity:1;transform:translateY(0);}
+[data-substep][data-anim="fly"]{transform:translateY(28px);transition:opacity 0.45s ease-out,transform 0.5s cubic-bezier(0.34,1.4,0.64,1);}
+[data-substep][data-anim="fly"].revealed{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -236,19 +238,19 @@ select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-r
         <div style="font-size:1.6rem;margin-bottom:0.4rem;">&#9889;</div>
         <div style="font-size:1rem;font-weight:800;color:var(--sf-star);margin-bottom:0.4rem;">EASY</div>
         <div style="font-size:0.85rem;font-weight:700;color:#FFFFFF;margin-bottom:0.3rem;">Build &amp; Scale Simply</div>
-        <p style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">Embed trusted AI into finance workflows. Personal finance agents, natural-language queries, agentic automation &mdash; no ML team required.</p>
+        <p data-substep="2" data-anim="fly" style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">Embed trusted AI into finance workflows. Personal finance agents, natural-language queries, agentic automation &mdash; no ML team required.</p>
       </div>
-      <div data-substep="2" style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(36,158,220,0.3);border-radius:14px;padding:1.1rem 1rem;text-align:center;">
+      <div data-substep="3" style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(36,158,220,0.3);border-radius:14px;padding:1.1rem 1rem;text-align:center;">
         <div style="font-size:1.6rem;margin-bottom:0.4rem;">&#128279;</div>
         <div style="font-size:1rem;font-weight:800;color:var(--sf-blue);margin-bottom:0.4rem;">CONNECTED</div>
         <div style="font-size:0.85rem;font-weight:700;color:#FFFFFF;margin-bottom:0.3rem;">Full Financial Visibility</div>
-        <p style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">Unify ERP, GL, sub-ledger, and operational data into one governed platform. Seamless integrations across SAP, Oracle, Workday &amp; more.</p>
+        <p data-substep="4" data-anim="fly" style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">Unify ERP, GL, sub-ledger, and operational data into one governed platform. Seamless integrations across SAP, Oracle, Workday &amp; more.</p>
       </div>
-      <div data-substep="3" style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(139,92,246,0.3);border-radius:14px;padding:1.1rem 1rem;text-align:center;">
+      <div data-substep="5" style="background:rgba(255,255,255,0.07);border:1.5px solid rgba(139,92,246,0.3);border-radius:14px;padding:1.1rem 1rem;text-align:center;">
         <div style="font-size:1.6rem;margin-bottom:0.4rem;">&#128737;</div>
         <div style="font-size:1rem;font-weight:800;color:#8b5cf6;margin-bottom:0.4rem;">TRUSTED</div>
         <div style="font-size:0.85rem;font-weight:700;color:#FFFFFF;margin-bottom:0.3rem;">Defensible to the Board</div>
-        <p style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">SOC 1/2, PCI DSS, HIPAA, FedRAMP. Govern and optimise AI spend and token use. Every answer auditable, every model explainable.</p>
+        <p data-substep="6" data-anim="fly" style="font-size:0.78rem;color:rgba(255,255,255,0.65);margin:0;max-width:100%;">SOC 1/2, PCI DSS, HIPAA, FedRAMP. Govern and optimise AI spend and token use. Every answer auditable, every model explainable.</p>
       </div>
     </div>
     <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:0.7rem 1rem;">
@@ -1265,7 +1267,10 @@ function goTo(i){
 }
 function getSubsteps(slideIdx){
   var el=document.getElementById(SLIDES[slideIdx]);
-  return el?el.querySelectorAll('[data-substep]'):[];
+  if(!el)return[];
+  var arr=Array.prototype.slice.call(el.querySelectorAll('[data-substep]'));
+  arr.sort(function(a,b){return parseInt(a.getAttribute('data-substep'))-parseInt(b.getAttribute('data-substep'));});
+  return arr;
 }
 function revealedCount(slideIdx){
   var subs=getSubsteps(slideIdx);
