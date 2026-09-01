@@ -1317,6 +1317,7 @@ function goTo(i){
   document.getElementById('slideSelect').value=i+1;
   current=i;
   if(narrating) narrateSlide(current);
+  if(autoPlay){clearTimeout(autoTimer);autoTimer=setTimeout(autoStep,2500);}
 }
 function getSubsteps(slideIdx){
   var el=document.getElementById(SLIDES[slideIdx]);
@@ -1465,7 +1466,6 @@ function startNarrate(){
   var btn=document.getElementById('narrateBtn');
   btn.classList.add('active');
   btn.innerHTML='&#9208; Narrating';
-  if(autoPlay)stopAuto();
   narrateSlide(current);
 }
 function stopNarrate(){
