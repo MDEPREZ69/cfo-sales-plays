@@ -1371,10 +1371,22 @@ function startAuto(){
   autoPlay=true;
   document.getElementById('autoBtn').classList.add('active');
   document.getElementById('autoBtn').innerHTML='Auto &#9208;';
-  if(!narrating){startTimerBar();autoTimer=setInterval(function(){if(current<TOTAL-1)nextSlide();else stopAuto();},15000);}
+  if(!narrating){autoStep();}
+}
+function autoStep(){
+  if(!autoPlay)return;
+  var subs=getSubsteps(current);
+  var rc=revealedCount(current);
+  if(subs.length>0&&rc<subs.length){
+    nextSlide();
+    autoTimer=setTimeout(autoStep,2000);
+  } else {
+    if(current<TOTAL-1){nextSlide();autoTimer=setTimeout(autoStep,4000);}
+    else stopAuto();
+  }
 }
 function stopAuto(){
-  autoPlay=false;clearInterval(autoTimer);
+  autoPlay=false;clearTimeout(autoTimer);
   document.getElementById('autoBtn').classList.remove('active');
   document.getElementById('autoBtn').innerHTML='Auto &#9654;';
   resetTimerBar();
