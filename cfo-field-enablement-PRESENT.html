@@ -1381,7 +1381,6 @@ function autoStep(){
   if(!autoPlay)return;
   var subs=getSubsteps(current);
   var rc=revealedCount(current);
-  document.getElementById('autoBtn').innerHTML='Auto &#9208; '+(rc)+'/'+subs.length;
   if(subs.length>0 && rc<subs.length){
     subs[rc].classList.add('revealed');
     autoTimer=setTimeout(autoStep,2500);
