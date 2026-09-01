@@ -66,6 +66,8 @@ select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-r
 .doc-dl-btn:hover{background:var(--sf-mid);}
 .doc-preview-icon{display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.6rem;border-radius:7px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:0.62rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background 0.2s;}
 .doc-preview-icon:hover{background:rgba(255,255,255,0.25);}
+[data-substep]{opacity:0;transform:translateY(8px);transition:opacity 0.5s ease,transform 0.5s ease;}
+[data-substep].revealed{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -198,17 +200,17 @@ select.slide-sel{background:#FFFFFF;border:1px solid var(--border-card);border-r
           <div style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:10px solid #E8F0FE;"></div>
           <div style="position:absolute;left:-11.5px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:11px solid rgba(17,86,127,0.18);z-index:-1;"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
-            <div style="text-align:center;padding:0.3rem;">
+            <div data-substep="1" style="text-align:center;padding:0.3rem;">
               <div style="font-size:1.1rem;margin-bottom:0.2rem;">&#128200;</div>
               <p style="font-size:0.76rem;font-weight:800;color:var(--sf-mid);margin:0 0 0.15rem;">Revenue &amp; Margins</p>
               <p style="font-size:0.64rem;color:var(--text-light);margin:0;line-height:1.35;">Erodes margin &mdash; accounting latency &amp; reconciliation gaps obscure true P&amp;L</p>
             </div>
-            <div style="text-align:center;padding:0.3rem;border-left:1px solid rgba(17,86,127,0.12);border-right:1px solid rgba(17,86,127,0.12);">
+            <div data-substep="2" style="text-align:center;padding:0.3rem;border-left:1px solid rgba(17,86,127,0.12);border-right:1px solid rgba(17,86,127,0.12);">
               <div style="font-size:1.1rem;margin-bottom:0.2rem;">&#128181;</div>
               <p style="font-size:0.76rem;font-weight:800;color:var(--sf-mid);margin:0 0 0.15rem;">Reduce Cost</p>
               <p style="font-size:0.64rem;color:var(--text-light);margin:0;line-height:1.35;">Obscures liquidity &mdash; defensive buffers trap working capital &amp; slow innovation</p>
             </div>
-            <div style="text-align:center;padding:0.3rem;">
+            <div data-substep="3" style="text-align:center;padding:0.3rem;">
               <div style="font-size:1.1rem;margin-bottom:0.2rem;">&#128737;</div>
               <p style="font-size:0.76rem;font-weight:800;color:var(--sf-mid);margin:0 0 0.15rem;">Compliance &amp; Trust</p>
               <p style="font-size:0.64rem;color:var(--text-light);margin:0;line-height:1.35;">Governance risk &mdash; no unified data perimeter, no audit trail for AI decisions</p>
@@ -1253,14 +1255,39 @@ function goTo(i){
   if(i<0)i=0;if(i>=TOTAL)i=TOTAL-1;
   document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('active');});
   document.getElementById(SLIDES[i]).classList.add('active');
+  var oldSubs=getSubsteps(current);
+  for(var j=0;j<oldSubs.length;j++)oldSubs[j].classList.remove('revealed');
   document.getElementById('progressBar').style.width=((i+1)/TOTAL*100)+'%';
   document.getElementById('slideSelect').value=i+1;
   current=i;
   if(narrating) narrateSlide(current);
   if(autoPlay&&!narrating) startTimerBar();
 }
-function nextSlide(){if(current<TOTAL-1)goTo(current+1);}
-function prevSlide(){if(current>0)goTo(current-1);}
+function getSubsteps(slideIdx){
+  var el=document.getElementById(SLIDES[slideIdx]);
+  return el?el.querySelectorAll('[data-substep]'):[];
+}
+function revealedCount(slideIdx){
+  var subs=getSubsteps(slideIdx);
+  var c=0;for(var j=0;j<subs.length;j++){if(subs[j].classList.contains('revealed'))c++;}
+  return c;
+}
+function nextSlide(){
+  var subs=getSubsteps(current);
+  if(subs.length>0){
+    var rc=revealedCount(current);
+    if(rc<subs.length){subs[rc].classList.add('revealed');return;}
+  }
+  if(current<TOTAL-1)goTo(current+1);
+}
+function prevSlide(){
+  var subs=getSubsteps(current);
+  if(subs.length>0){
+    var rc=revealedCount(current);
+    if(rc>0){subs[rc-1].classList.remove('revealed');return;}
+  }
+  if(current>0)goTo(current-1);
+}
 
 document.getElementById('btnHome').addEventListener('click',function(){goTo(0);});
 document.getElementById('btnPrev').addEventListener('click',prevSlide);
