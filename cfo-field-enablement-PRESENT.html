@@ -1447,7 +1447,20 @@ function narrateSlide(i){
   if(!ch||!ch.length)return;
   playQueue(ch,function(){
     if(narrating&&current<TOTAL-1){
-      narrationTimer=setTimeout(function(){nextSlide();},800);
+      var subs=getSubsteps(current);
+      var rc=revealedCount(current);
+      if(subs.length>0&&rc<subs.length){
+        // substeps still unrevealed — wait for auto or manual clicks to finish them
+        // then check again every second
+        (function waitSubs(){
+          if(!narrating)return;
+          var r2=revealedCount(current);
+          if(r2>=subs.length){narrationTimer=setTimeout(function(){goTo(current+1);},800);}
+          else{narrationTimer=setTimeout(waitSubs,1000);}
+        })();
+      } else {
+        narrationTimer=setTimeout(function(){goTo(current+1);},800);
+      }
     } else if(current>=TOTAL-1){stopNarrate();stopAuto();}
   });
 }
