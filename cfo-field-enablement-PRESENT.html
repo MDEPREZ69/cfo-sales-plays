@@ -1317,7 +1317,7 @@ function goTo(i){
   document.getElementById('slideSelect').value=i+1;
   current=i;
   if(narrating) narrateSlide(current);
-  if(autoPlay){clearTimeout(autoTimer);autoTimer=setTimeout(autoStep,2500);}
+  if(autoPlay){clearTimeout(autoTimer);var newSubs=getSubsteps(i);autoTimer=setTimeout(autoStep,newSubs.length>0?1500:5000);}
 }
 function getSubsteps(slideIdx){
   var el=document.getElementById(SLIDES[slideIdx]);
@@ -1384,7 +1384,6 @@ function autoStep(){
     autoTimer=setTimeout(autoStep,2500);
   } else if(current<TOTAL-1){
     goTo(current+1);
-    autoTimer=setTimeout(autoStep,5000);
   } else {
     stopAuto();
   }
@@ -1447,20 +1446,13 @@ function narrateSlide(i){
   if(!ch||!ch.length)return;
   playQueue(ch,function(){
     if(narrating&&current<TOTAL-1){
-      var subs=getSubsteps(current);
-      var rc=revealedCount(current);
-      if(subs.length>0&&rc<subs.length){
-        // substeps still unrevealed — wait for auto or manual clicks to finish them
-        // then check again every second
-        (function waitSubs(){
-          if(!narrating)return;
-          var r2=revealedCount(current);
-          if(r2>=subs.length){narrationTimer=setTimeout(function(){goTo(current+1);},800);}
-          else{narrationTimer=setTimeout(waitSubs,1000);}
-        })();
-      } else {
-        narrationTimer=setTimeout(function(){goTo(current+1);},800);
+      if(autoPlay){
+        // Auto is running — let auto handle ALL slide advancement and substep reveals.
+        // Narration just plays audio, never advances. Auto's goTo will trigger narrateSlide for the next slide.
+        return;
       }
+      // Narration-only mode (no auto): advance after a pause
+      narrationTimer=setTimeout(function(){goTo(current+1);},800);
     } else if(current>=TOTAL-1){stopNarrate();stopAuto();}
   });
 }
