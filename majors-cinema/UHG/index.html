@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>UHG x Snowflake — AI-Native Intelligence Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#002677;--sf-cyan:#29B5E8;--sf-deep:#0A2540;--dark:#0d0d0d;--card-bg:rgba(20,20,28,0.85)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--dark);color:#fff;overflow-x:hidden}
+.hero{position:relative;width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=1920&q=80') center/cover no-repeat}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,0.82) 0%,rgba(13,0,8,0.75) 40%,rgba(10,37,64,0.7) 100%)}
+.hero-content{position:relative;z-index:2;text-align:center;padding:3rem 2rem}
+.logos{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-bottom:2.5rem}
+.logos img{height:42px;width:auto}
+.logos .sep{width:1px;height:36px;background:rgba(255,255,255,0.25)}
+.hero-title{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin-bottom:1rem}
+.hero-title .accent{background:linear-gradient(90deg,var(--sf-cyan),var(--brand));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(0.85rem,1.4vw,1.15rem);font-weight:300;color:rgba(255,255,255,0.7);max-width:600px;margin:0 auto 2.5rem}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;max-width:1400px;width:94%;margin:0 auto;padding-bottom:3rem}
+.card{position:relative;border-radius:14px;overflow:hidden;background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1),box-shadow 0.4s ease;cursor:pointer;text-decoration:none;color:#fff;display:block}
+.card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 48px rgba(0,0,0,0.5),0 0 0 1px rgba(41,181,232,0.15)}
+.card.coming-soon{cursor:default;opacity:0.5}
+.card.coming-soon:hover{transform:none;box-shadow:none}
+.macbook-frame{position:relative;padding:0.7rem 0.7rem 0;background:linear-gradient(180deg,rgba(30,30,40,1) 0%,rgba(20,20,28,1) 100%)}
+.macbook-screen{border-radius:5px 5px 0 0;overflow:hidden;border:2px solid rgba(60,60,70,0.8);aspect-ratio:16/10;background:#1a1a2e;position:relative}
+.screen-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+.macbook-base{height:8px;background:linear-gradient(180deg,#3a3a44 0%,#2a2a34 100%);border-radius:0 0 3px 3px;margin:0 1.2rem;position:relative}
+.macbook-base::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:rgba(80,80,90,0.6);border-radius:2px}
+.card-info{padding:0.9rem 1rem 1.1rem}
+.card-tag{display:inline-block;font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.5rem;border-radius:20px;margin-bottom:0.4rem}
+.tag-plan{background:rgba(212,0,30,0.15);color:#ff4d6a}
+.tag-ttmd{background:rgba(41,181,232,0.15);color:var(--sf-cyan)}
+.tag-soon{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4)}
+.card-title{font-size:0.85rem;font-weight:700;margin-bottom:0.25rem;line-height:1.3}
+.card-desc{font-size:0.7rem;font-weight:300;color:rgba(255,255,255,0.55);line-height:1.4}
+.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(41,181,232,0.04) 0%,transparent 70%);opacity:0;transition:opacity 0.4s}
+.card:hover::before{opacity:1}
+.modal-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease}
+.modal-overlay.active{display:flex;opacity:1}
+.modal-frame{position:relative;width:96vw;height:94vh;border-radius:12px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6)}
+.modal-frame iframe{width:100%;height:100%;border:none;background:#fff}
+.modal-close{position:absolute;top:12px;right:16px;z-index:10001;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.modal-close:hover{background:rgba(212,0,30,0.8)}
+.footer{text-align:center;padding:2rem;font-size:0.75rem;color:rgba(255,255,255,0.3);border-top:1px solid rgba(255,255,255,0.05)}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(0) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) rotate(720deg);opacity:0}}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div id="particles"></div>
+  <div class="hero-content">
+    <div class="logos">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAAaCAMAAADmDuV0AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAC5VBMVEUAAAAaM2YgQGgdO2wePWweO2sfPWYiRGYePWoePWoePGoePGszM2YePWoePmodPWwePmoePmoePGoePGofPWsrK1UdO2wdPGkfPWoePWofPWofPWodPWsgQGAcPWkePWobPGsePGoePWoePWscPWgAVVUePWoePWofP2odPmohO2kePmscOWgePGkePWsaPmogQGwePGkfPmgjOmgePGkXRnQgPGwcPWkaQGYkSW0ePWoePGofPmoAAAAkN20bQ2sfP2sePWcePWoePmsePWsePmoePWoePWofPWsePGsePWsfPWkfPmocOXEcPmwdP2kfPmoePWsfPmoAAIAePWobQG0ePWonO2IePWohOmsePWoePWoePWkfPWkePWkfPGsePmoVQGofPWoePWoePmkdOm0ePWkePWoAQIAePWkePWofPmohN28ePWoePGofPmofPWodPGoePmoePWodPWoePWkePGkdPmkePWsePWshPG0gO2kePWkePGkePWodPWsePWofPWsePWoePWkePWofPmoePGoePWofPWoePWoePWoePGsfPWsdPWkePWoePWsePWkePmsfPmsfPmgdPGkePWocQGoePWkYPW0ePWkePWoePWoePWsdPGoePWoePGkfPGsdPmoePWoePmogQHAfPWkdPmocPGofPmoePWogOmoePWsePWofPWofPWoePWocOWMePWodPmsePmsdPWkePGodPWoePWodPGofPmodP2ofO2kePWofPWgdPGkePWsePGoePWoePWoePWofPmwdPGscPmcdPWkePGoiPGYePWodPWsePWoePWodPWkePWodPWofPmkePWsePmoePGoePWoePWodPGofPWoePWoePWkfPWkdPWodPGoePWodPmoePWkePGoePGkePWoePGodPmoePWoePWodPWsgQGoePWoePWkfPmkePWoePWodPGsePmoePWoeP2sfPmsdPWoePWr///9xpW8nAAAA9XRSTlMACiA0OysZD8ru6F0Fu+RHgG9Nup4GGoPI/OqvWAg/tSaY/u02A/XGQbYnmRtE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" style="filter:brightness(0) invert(1);height:36px" alt="UHG">
+      <div class="sep"></div>
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTg0cHgiIGhlaWdodD0iNDRweCIgdmlld0JveD0iMCAwIDE4NCA0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTUuMiAoNzgxODEpIC0gaHR0cHM6Ly9za2V0Y2hhcHAuY29tIC0tPgogICAgPHRpdGxlPkdyb3VwPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Ikdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMC4wMDIwMjcsIDAuNTMxMjUwKSIgZmlsbD0iIzI5QjVFOCIgZmlsbC1ydWxlPSJub256ZXJvIj4KICAgICAgICAgICAgPHBhdGggZD0iTTM3LjI2Mzc0NjUsMzMuMTI4OTA2IEwyOC4wODc5NjU1LDI3LjgyODEyNSBDMjYuNzk4OTAyNSwyNy4wODU5MzggMjUuMTUwNDY1NSwyNy41MjczNDQgMjQuNDA0MzcxNSwyOC44MTY0MDYgQzI0LjExNTMwODUsMjkuMzI0MjE5IDI0LjAwMjAyNzUsMjkuODgyODEyIDI0LjA1NjcxNTUsMzAuNDI1NzgxIEwyNC4wNTY3MTU1LDQwLjc4NTE1NiBDMjQuMDU2NzE1NSw0Mi4yNjU2MjUgMjUuMjU5ODM5NSw0My40Njg3NSAyNi43NDQyMTU1LDQzLjQ2ODc1IEMyOC4yMjQ2ODM1LDQzLjQ2ODc1IDI5LjQyNzgwODUsNDIuMjY1NjI1IDI5LjQyNzgwODUsNDAuNzg1MTU2IEwyOS40Mjc4MDg1LDM0LjgyODEyNSBMMzQuNTY4NDMzNSwzNy43OTY4NzUgQzM1Ljg1NzQ5NjUsMzguNTQyOTY5IDM3LjUwOTgzOTUsMzguMDk3NjU2IDM4LjI1MjAyNzUsMzYuODA4NTk0IEMzOC45OTgxMjE1LDM1LjUxOTUzMSAzOC41NTY3MTU1LDMzLjg3MTA5NCAzNy4yNjM3NDY1LDMzLjEyODkwNiIgaWQ9IlBhdGgiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=" alt="Snowflake" style="height:36px">
+    </div>
+    <h1 class="hero-title">AI-Native <span class="accent">MLR Planning</span></h1>
+    <p class="hero-subtitle">Decision intelligence powered by Snowflake — from cinematic strategy teasers to daily executive briefings.</p>
+  </div>
+  <div class="cards">
+    <a class="card" href="UHG-MLR-Planning-Teaser.html" data-modal>
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#1a0005 0%,rgba(0,38,119,0.4) 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:#ff4d6a;font-weight:600;margin-bottom:0.3rem">SnowPlan Teaser</div>
+            <div style="font-size:0.8rem;font-weight:800;color:#fff;text-align:center;line-height:1.2">Medical Loss Ratio<br>Planning</div>
+            <div style="width:24px;height:2px;background:#002677;margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.5)">20-Slide Cinematic Deck</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-plan">MLR Planning</span>
+        <div class="card-title">MLR Planning</div>
+        <div class="card-desc">AI-native MLR optimisation across health plan segments.</div>
+      </div>
+    </a>
+    <a class="card" href="good-morning-uhg-pechakucha.html" data-modal>
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#0A2540 0%,#11567F 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:#29B5E8;font-weight:600;margin-bottom:0.3rem">Daily Briefing</div>
+            <div style="font-size:0.85rem;font-weight:800;color:#fff;text-align:center;line-height:1.2">Good Morning,<br>John</div>
+            <div style="width:24px;height:2px;background:#29B5E8;margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.5)">Talk to Your Data</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-ttmd">CFO Briefing</span>
+        <div class="card-title">Good Morning, John</div>
+        <div class="card-desc">Talk to Your Data conversational analytics for the CFO.</div>
+      </div>
+    </a>
+    <div class="card coming-soon">
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#0a0a1e 0%,#1a1040 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:0.3rem">Coming Soon</div>
+            <div style="font-size:0.8rem;font-weight:800;color:rgba(255,255,255,0.5);text-align:center;line-height:1.2">CHRO / CSO<br>Planning</div>
+            <div style="width:24px;height:2px;background:rgba(255,255,255,0.2);margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.3)">Strategic Workforce</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-soon">Coming Soon</span>
+        <div class="card-title">CHRO / CSO Planning</div>
+        <div class="card-desc">Strategic workforce & sales planning — next pillar.</div>
+      </div>
+    </div>
+    <div class="card coming-soon">
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#1a1a0a 0%,#2d2d1b 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:0.3rem">Coming Soon</div>
+            <div style="font-size:0.8rem;font-weight:800;color:rgba(255,255,255,0.5);text-align:center;line-height:1.2">CMO / COO<br>Intelligence</div>
+            <div style="width:24px;height:2px;background:rgba(255,255,255,0.2);margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.3)">Revenue & Operations</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-soon">Coming Soon</span>
+        <div class="card-title">CMO / COO Intelligence</div>
+        <div class="card-desc">Marketing & operations — extending the decision fabric.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal">
+  <div class="modal-frame">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <iframe id="modal-iframe" src="about:blank"></iframe>
+  </div>
+</div>
+<div class="footer">UHG x Snowflake — Powered by Cortex AI & SnowPlan</div>
+<script>
+(function(){var c=document.getElementById('particles');var cols=['rgba(41,181,232,0.3)','rgba(255,255,255,0.1)','rgba(0,38,119,0.4)'];for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';var s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.bottom='-20px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDuration=(Math.random()*12+8)+'s';p.style.animationDelay=(Math.random()*8)+'s';c.appendChild(p)}})();
+(function(){var m=document.getElementById('modal'),f=document.getElementById('modal-iframe'),x=document.getElementById('modal-close');document.querySelectorAll('.card[data-modal]').forEach(function(c){c.addEventListener('click',function(e){e.preventDefault();f.src=this.getAttribute('href');m.classList.add('active')});});x.addEventListener('click',function(){m.classList.remove('active');f.src='about:blank'});m.addEventListener('click',function(e){if(e.target===m)x.click()});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&m.classList.contains('active'))x.click()});})();
+</script>
+</body>
+</html>

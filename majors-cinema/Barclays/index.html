@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Barclays x Snowflake — AI-Native Intelligence Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#00AEEF;--sf-cyan:#29B5E8;--sf-deep:#0A2540;--dark:#0d0d0d;--card-bg:rgba(20,20,28,0.85)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--dark);color:#fff;overflow-x:hidden}
+.hero{position:relative;width:100%;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1920&q=80') center/cover no-repeat}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,0.82) 0%,rgba(13,0,8,0.75) 40%,rgba(10,37,64,0.7) 100%)}
+.hero-content{position:relative;z-index:2;text-align:center;padding:3rem 2rem}
+.logos{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-bottom:2.5rem}
+.logos img{height:42px;width:auto}
+.logos .sep{width:1px;height:36px;background:rgba(255,255,255,0.25)}
+.hero-title{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin-bottom:1rem}
+.hero-title .accent{background:linear-gradient(90deg,var(--sf-cyan),var(--brand));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(0.85rem,1.4vw,1.15rem);font-weight:300;color:rgba(255,255,255,0.7);max-width:600px;margin:0 auto 2.5rem}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;max-width:1400px;width:94%;margin:0 auto;padding-bottom:3rem}
+.card{position:relative;border-radius:14px;overflow:hidden;background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1),box-shadow 0.4s ease;cursor:pointer;text-decoration:none;color:#fff;display:block}
+.card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 48px rgba(0,0,0,0.5),0 0 0 1px rgba(41,181,232,0.15)}
+.card.coming-soon{cursor:default;opacity:0.5}
+.card.coming-soon:hover{transform:none;box-shadow:none}
+.macbook-frame{position:relative;padding:0.7rem 0.7rem 0;background:linear-gradient(180deg,rgba(30,30,40,1) 0%,rgba(20,20,28,1) 100%)}
+.macbook-screen{border-radius:5px 5px 0 0;overflow:hidden;border:2px solid rgba(60,60,70,0.8);aspect-ratio:16/10;background:#1a1a2e;position:relative}
+.screen-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem}
+.macbook-base{height:8px;background:linear-gradient(180deg,#3a3a44 0%,#2a2a34 100%);border-radius:0 0 3px 3px;margin:0 1.2rem;position:relative}
+.macbook-base::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:rgba(80,80,90,0.6);border-radius:2px}
+.card-info{padding:0.9rem 1rem 1.1rem}
+.card-tag{display:inline-block;font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.5rem;border-radius:20px;margin-bottom:0.4rem}
+.tag-plan{background:rgba(212,0,30,0.15);color:#ff4d6a}
+.tag-ttmd{background:rgba(41,181,232,0.15);color:var(--sf-cyan)}
+.tag-soon{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4)}
+.card-title{font-size:0.85rem;font-weight:700;margin-bottom:0.25rem;line-height:1.3}
+.card-desc{font-size:0.7rem;font-weight:300;color:rgba(255,255,255,0.55);line-height:1.4}
+.card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(41,181,232,0.04) 0%,transparent 70%);opacity:0;transition:opacity 0.4s}
+.card:hover::before{opacity:1}
+.modal-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease}
+.modal-overlay.active{display:flex;opacity:1}
+.modal-frame{position:relative;width:96vw;height:94vh;border-radius:12px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6)}
+.modal-frame iframe{width:100%;height:100%;border:none;background:#fff}
+.modal-close{position:absolute;top:12px;right:16px;z-index:10001;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.modal-close:hover{background:rgba(212,0,30,0.8)}
+.footer{text-align:center;padding:2rem;font-size:0.75rem;color:rgba(255,255,255,0.3);border-top:1px solid rgba(255,255,255,0.05)}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(0) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) rotate(720deg);opacity:0}}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div id="particles"></div>
+  <div class="hero-content">
+    <div class="logos">
+      <img src="data:image/png;base64,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" alt="Barclays" style="height:36px">
+      <div class="sep"></div>
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTg0cHgiIGhlaWdodD0iNDRweCIgdmlld0JveD0iMCAwIDE4NCA0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTUuMiAoNzgxODEpIC0gaHR0cHM6Ly9za2V0Y2hhcHAuY29tIC0tPgogICAgPHRpdGxlPkdyb3VwPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Ikdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMC4wMDIwMjcsIDAuNTMxMjUwKSIgZmlsbD0iIzI5QjVFOCIgZmlsbC1ydWxlPSJub256ZXJvIj4KICAgICAgICAgICAgPHBhdGggZD0iTTM3LjI2Mzc0NjUsMzMuMTI4OTA2IEwyOC4wODc5NjU1LDI3LjgyODEyNSBDMjYuNzk4OTAyNSwyNy4wODU5MzggMjUuMTUwNDY1NSwyNy41MjczNDQgMjQuNDA0MzcxNSwyOC44MTY0MDYgQzI0LjExNTMwODUsMjkuMzI0MjE5IDI0LjAwMjAyNzUsMjkuODgyODEyIDI0LjA1NjcxNTUsMzAuNDI1NzgxIEwyNC4wNTY3MTU1LDQwLjc4NTE1NiBDMjQuMDU2NzE1NSw0Mi4yNjU2MjUgMjUuMjU5ODM5NSw0My40Njg3NSAyNi43NDQyMTU1LDQzLjQ2ODc1IEMyOC4yMjQ2ODM1LDQzLjQ2ODc1IDI5LjQyNzgwODUsNDIuMjY1NjI1IDI5LjQyNzgwODUsNDAuNzg1MTU2IEwyOS40Mjc4MDg1LDM0LjgyODEyNSBMMzQuNTY4NDMzNSwzNy43OTY4NzUgQzM1Ljg1NzQ5NjUsMzguNTQyOTY5IDM3LjUwOTgzOTUsMzguMDk3NjU2IDM4LjI1MjAyNzUsMzYuODA4NTk0IEMzOC45OTgxMjE1LDM1LjUxOTUzMSAzOC41NTY3MTU1LDMzLjg3MTA5NCAzNy4yNjM3NDY1LDMzLjEyODkwNiIgaWQ9IlBhdGgiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=" alt="Snowflake" style="height:36px">
+    </div>
+    <h1 class="hero-title">AI-Native <span class="accent">Cost-Income Ratio Planning</span></h1>
+    <p class="hero-subtitle">Decision intelligence powered by Snowflake — from cinematic strategy teasers to daily executive briefings.</p>
+  </div>
+  <div class="cards">
+    <a class="card" href="Barclays-CIR-Planning-Teaser.html" data-modal>
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#1a0005 0%,rgba(0,174,239,0.4) 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:#ff4d6a;font-weight:600;margin-bottom:0.3rem">SnowPlan Teaser</div>
+            <div style="font-size:0.8rem;font-weight:800;color:#fff;text-align:center;line-height:1.2">Cost-Income Ratio<br>Planning</div>
+            <div style="width:24px;height:2px;background:#00AEEF;margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.5)">20-Slide Cinematic Deck</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-plan">CIR Planning</span>
+        <div class="card-title">Cost-Income Ratio Planning</div>
+        <div class="card-desc">AI-native CIR optimisation — five divisions, GBP 1.2B savings.</div>
+      </div>
+    </a>
+    <a class="card" href="good-morning-barclays-pechakucha.html" data-modal>
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#0A2540 0%,#11567F 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:#29B5E8;font-weight:600;margin-bottom:0.3rem">Daily Briefing</div>
+            <div style="font-size:0.85rem;font-weight:800;color:#fff;text-align:center;line-height:1.2">Good Morning,<br>Anna</div>
+            <div style="width:24px;height:2px;background:#29B5E8;margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.5)">Talk to Your Data</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-ttmd">CFO Briefing</span>
+        <div class="card-title">Good Morning, Anna</div>
+        <div class="card-desc">Talk to Your Data conversational analytics for the CFO.</div>
+      </div>
+    </a>
+    <div class="card coming-soon">
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#0a0a1e 0%,#1a1040 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:0.3rem">Coming Soon</div>
+            <div style="font-size:0.8rem;font-weight:800;color:rgba(255,255,255,0.5);text-align:center;line-height:1.2">CHRO / CSO<br>Planning</div>
+            <div style="width:24px;height:2px;background:rgba(255,255,255,0.2);margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.3)">Strategic Workforce</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-soon">Coming Soon</span>
+        <div class="card-title">CHRO / CSO Planning</div>
+        <div class="card-desc">Strategic workforce & sales planning — next pillar.</div>
+      </div>
+    </div>
+    <div class="card coming-soon">
+      <div class="macbook-frame">
+        <div class="macbook-screen">
+          <div class="screen-content" style="background:linear-gradient(135deg,#1a1a0a 0%,#2d2d1b 50%,#0A2540 100%)">
+            <div style="font-size:0.5rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:0.3rem">Coming Soon</div>
+            <div style="font-size:0.8rem;font-weight:800;color:rgba(255,255,255,0.5);text-align:center;line-height:1.2">CMO / COO<br>Intelligence</div>
+            <div style="width:24px;height:2px;background:rgba(255,255,255,0.2);margin:0.4rem 0;border-radius:1px"></div>
+            <div style="font-size:0.45rem;color:rgba(255,255,255,0.3)">Revenue & Operations</div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+      <div class="card-info">
+        <span class="card-tag tag-soon">Coming Soon</span>
+        <div class="card-title">CMO / COO Intelligence</div>
+        <div class="card-desc">Marketing & operations — extending the decision fabric.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal">
+  <div class="modal-frame">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <iframe id="modal-iframe" src="about:blank"></iframe>
+  </div>
+</div>
+<div class="footer">Barclays x Snowflake — Powered by Cortex AI & SnowPlan</div>
+<script>
+(function(){var c=document.getElementById('particles');var cols=['rgba(41,181,232,0.3)','rgba(255,255,255,0.1)','rgba(0,174,239,0.4)'];for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';var s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.bottom='-20px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDuration=(Math.random()*12+8)+'s';p.style.animationDelay=(Math.random()*8)+'s';c.appendChild(p)}})();
+(function(){var m=document.getElementById('modal'),f=document.getElementById('modal-iframe'),x=document.getElementById('modal-close');document.querySelectorAll('.card[data-modal]').forEach(function(c){c.addEventListener('click',function(e){e.preventDefault();f.src=this.getAttribute('href');m.classList.add('active')});});x.addEventListener('click',function(){m.classList.remove('active');f.src='about:blank'});m.addEventListener('click',function(e){if(e.target===m)x.click()});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&m.classList.contains('active'))x.click()});})();
+</script>
+</body>
+</html>
